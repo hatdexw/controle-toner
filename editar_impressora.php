@@ -1,0 +1,79 @@
+<?php
+require 'db.php';
+
+if (!isset($_GET['id'])) {
+    header('Location: impressoras.php');
+    exit;
+}
+
+$id = $_GET['id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $codigo = $_POST['codigo'];
+    $modelo = $_POST['modelo'];
+    $localizacao = $_POST['localizacao'];
+
+    try {
+        $stmt = $pdo->prepare('UPDATE impressoras SET codigo = ?, modelo = ?, localizacao = ? WHERE id = ?');
+        $stmt->execute([$codigo, $modelo, $localizacao, $id]);
+        header('Location: impressoras.php');
+        exit;
+    } catch (PDOException $e) {
+        $error = "Erro ao atualizar impressora. Verifique se o codigo ja existe.";
+    }
+}
+
+$stmt = $pdo->prepare('SELECT * FROM impressoras WHERE id = ?');
+$stmt->execute([$id]);
+$impressora = $stmt->fetch();
+
+if (!$impressora) {
+    header('Location: impressoras.php');
+    exit;
+}
+
+require 'layout/header.php';
+?>
+
+<h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Editar Impressora</h1>
+
+<?php if (isset($error)): ?>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+        <span class="block sm:inline font-medium"><?= $error ?></span>
+    </div>
+<?php endif; ?>
+
+<div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Detalhes da Impressora</h2>
+    <form method="POST" action="editar_impressora.php?id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <div>
+            <label for="codigo" class="block text-sm font-semibold text-gray-700 mb-1">Codigo</label>
+            <input type="text" name="codigo" id="codigo" value="<?= htmlspecialchars($impressora['codigo']) ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>
+        </div>
+        <div>
+            <label for="modelo" class="block text-sm font-semibold text-gray-700 mb-1">Modelo</label>
+            <input type="text" name="modelo" id="modelo" value="<?= htmlspecialchars($impressora['modelo']) ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>
+        </div>
+        <div>
+            <label for="localizacao" class="block text-sm font-semibold text-gray-700 mb-1">Localizacao</label>
+            <input type="text" name="localizacao" id="localizacao" value="<?= htmlspecialchars($impressora['localizacao']) ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>
+        </div>
+        <div class="md:col-span-3 flex justify-end space-x-4 mt-4">
+            <button type="submit" class="inline-flex justify-center items-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Atualizar Impressora
+            </button>
+            <a href="impressoras.php" class="inline-flex justify-center items-center py-3 px-6 border border-gray-300 shadow-sm text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0L6 12.414l-1.293 1.293a1 1 0 01-1.414-1.414l2-2a1 1 0 011.414 0l2 2 1.293-1.293a1 1 0 011.414 1.414L9.707 14.707z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 2a8 8 0 100 16 8 8 0 000-16z" clip-rule="evenodd" />
+                </svg>
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<?php require 'layout/footer.php'; ?>

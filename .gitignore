@@ -1,0 +1,14 @@
+# Dependências do Node.js
+/node_modules/
+
+# Arquivos de build
+/dist/
+
+# Arquivo de configuração do banco de dados (Contém senhas!)
+db.php
+
+# Arquivos de ambiente (boa prática adicionar)
+.env
+
+# Arquivo com dados do banco de dados (se contiver dados reais e não apenas a estrutura)
+database.sql

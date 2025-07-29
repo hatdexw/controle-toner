@@ -1,0 +1,15 @@
+{
+  "name": "controle-toner",
+  "version": "1.0.0",
+  "description": "Sistema de controle de toner",
+  "main": "index.php",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
+  }
+}

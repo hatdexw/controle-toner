@@ -1,0 +1,58 @@
+<?php
+require 'db.php';
+
+require 'layout/header.php';
+
+$stmt = $pdo->query(
+    'SELECT i.id, i.codigo, i.modelo, i.localizacao, h.data_troca, s.modelo as suprimento_modelo, s.tipo 
+     FROM impressoras i 
+     LEFT JOIN (SELECT impressora_id, MAX(data_troca) as max_data FROM historico_trocas GROUP BY impressora_id) as ht 
+     ON i.id = ht.impressora_id
+     LEFT JOIN historico_trocas h ON h.impressora_id = i.id AND h.data_troca = ht.max_data
+     LEFT JOIN suprimentos s ON s.id = h.suprimento_id
+     ORDER BY i.codigo'
+);
+
+?>
+
+<h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Impressoras</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <?php while ($impressora = $stmt->fetch()) {
+    ?>
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex flex-col transform transition-transform duration-300 hover:scale-105">
+            <div class="flex items-center mb-4">
+                <!-- Icone de Impressora (SVG simples) -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-600 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($impressora['codigo']) ?></h3>
+                    <p class="text-gray-600 text-sm">Modelo: <span class="font-medium"><?= htmlspecialchars($impressora['modelo']) ?></span></p>
+                </div>
+            </div>
+            
+            <p class="text-gray-700 text-base mb-4">Localizacao: <span class="font-semibold"><?= htmlspecialchars($impressora['localizacao']) ?></span></p>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 flex-grow">
+                <?php if ($impressora['data_troca']) : ?>
+                    <p class="text-sm text-gray-700 mb-1">Ultima troca: <span class="font-medium text-indigo-700"><?= date('d/m/Y H:i', strtotime($impressora['data_troca'])) ?></span></p>
+                    <p class="text-sm text-gray-700">Suprimento: <span class="font-medium text-indigo-700"><?= htmlspecialchars($impressora['suprimento_modelo']) ?> (<?= htmlspecialchars($impressora['tipo']) ?>)</span></p>
+                <?php else : ?>
+                    <p class="text-sm text-gray-500 italic">Nenhuma troca registrada ainda.</p>
+                <?php endif; ?>
+            </div>
+            <div class="mt-auto text-right">
+                <a href="trocar.php?impressora_id=<?= $impressora['id'] ?>" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V3a1 1 0 00-1-1h-6z" />
+                        <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                    </svg>
+                    Registrar Troca
+                </a>
+            </div>
+        </div>
+    <?php } ?>
+</div>
+
+<?php require 'layout/footer.php'; ?>

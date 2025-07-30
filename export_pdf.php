@@ -70,7 +70,7 @@ class PDF extends FPDF
         $this->SetFont('','B', 9);
 
         // Larguras das colunas (total 190mm para A4 com margens de 10mm)
-        // Larguras das colunas ajustadas (total 190mm)
+        // Larguras das colunas ajustadas b(total 190mm)
         $w = array(30, 25, 40, 30, 45, 20);
         
         // Cabecalho

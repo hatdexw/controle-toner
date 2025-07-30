@@ -10,8 +10,8 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
-    <nav class="bg-gray-800 shadow-lg py-4 px-6">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-24">
+    <nav class="bg-gray-800 shadow-lg py-4 px-6 fixed top-0 w-full z-50">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.php" class="text-white text-2xl font-bold tracking-tight">Controle de Toners</a>
             <div class="flex space-x-4">
@@ -32,4 +32,4 @@
             </div>
         </div>
     </nav>
-    <main class="flex-grow container mx-auto p-6 mt-4">
+    <main class="flex-grow container mx-auto p-6">

@@ -94,6 +94,14 @@ require 'layout/header.php';
                                     Atualizar
                                 </button>
                             </form>
+                            <?php if ($suprimento['quantidade'] <= 5) : ?>
+                                <div class="mt-2 flex items-center text-xs text-red-600 font-semibold">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.492-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-4a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    Estoque baixo!
+                                </div>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <a href="estoque.php?delete=<?= $suprimento['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este suprimento? Isso pode afetar o historico de trocas.')" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">

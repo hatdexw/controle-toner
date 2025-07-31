@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/src/db/connection.php';
 require __DIR__ . '/src/actions/estoque_actions.php';
+require_once __DIR__ . '/src/core/csrf.php';
 
 $stmt = $pdo->query('SELECT * FROM suprimentos ORDER BY modelo');
 $suprimentos = $stmt->fetchAll();
@@ -13,6 +14,7 @@ require 'layout/header.php';
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Adicionar Novo Suprimento</h2>
     <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
             <label for="modelo" class="block text-sm font-semibold text-gray-700 mb-1">Modelo do Suprimento</label>
             <input type="text" name="modelo" id="modelo" placeholder="Ex: Toner HP 85A" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>
@@ -58,6 +60,7 @@ require 'layout/header.php';
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($suprimento['tipo']) ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <form method="POST" class="flex items-center space-x-2">
+                                <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
                                 <input type="hidden" name="id" value="<?= $suprimento['id'] ?>">
                                 <input type="number" name="quantidade" value="<?= $suprimento['quantidade'] ?>" class="border border-gray-300 p-2 rounded-md w-20 text-center text-sm focus:border-blue-500 focus:ring-blue-500">
                                 <button type="submit" name="update_suprimento" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">

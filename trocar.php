@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/src/db/connection.php';
 require __DIR__ . '/src/actions/trocar_actions.php';
+require_once __DIR__ . '/src/core/csrf.php';
 
 // Obter detalhes da impressora
 $stmt = $pdo->prepare('SELECT id, codigo, modelo, localizacao FROM impressoras WHERE id = ?');
@@ -30,6 +31,7 @@ require 'layout/header.php';
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Impressora: <span class="text-indigo-600"><?= htmlspecialchars($impressora['codigo']) ?></span> - <?= htmlspecialchars($impressora['modelo']) ?> (<span class="text-gray-600"><?= htmlspecialchars($impressora['localizacao']) ?></span>)</h2>
     <form method="POST" action="trocar?impressora_id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
             <label for="suprimento_id" class="block text-sm font-semibold text-gray-700 mb-1">Suprimento a ser utilizado</label>
             <select name="suprimento_id" id="suprimento_id" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base p-3 leading-normal transition-all duration-200" required>

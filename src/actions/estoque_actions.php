@@ -1,23 +1,44 @@
 <?php
 require_once __DIR__ . '/../db/connection.php';
+require_once __DIR__ . '/../core/csrf.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['add_suprimento'])) {
-        $modelo = $_POST['modelo'];
-        $tipo = $_POST['tipo'];
-        $quantidade = $_POST['quantidade'];
+    validate_csrf_token();
 
-        $stmt = $pdo->prepare('INSERT INTO suprimentos (modelo, tipo, quantidade) VALUES (?, ?, ?)');
-        $stmt->execute([$modelo, $tipo, $quantidade]);
+    if (isset($_POST['add_suprimento'])) {
+        if (empty($_POST['modelo']) || empty($_POST['tipo']) || !isset($_POST['quantidade'])) {
+            $error = "Todos os campos sao obrigatorios.";
+        } else {
+            $modelo = trim($_POST['modelo']);
+            $tipo = trim($_POST['tipo']);
+            $quantidade = filter_input(INPUT_POST, 'quantidade', FILTER_VALIDATE_INT);
+
+            if ($quantidade === false || $quantidade < 0) {
+                $error = "A quantidade deve ser um numero inteiro valido.";
+            } else {
+                try {
+                    $stmt = $pdo->prepare('INSERT INTO suprimentos (modelo, tipo, quantidade) VALUES (?, ?, ?)');
+                    $stmt->execute([$modelo, $tipo, $quantidade]);
+                    header('Location: estoque');
+                    exit;
+                } catch (PDOException $e) {
+                    $error = "Erro de banco de dados ao adicionar suprimento.";
+                }
+            }
+        }
     } elseif (isset($_POST['update_suprimento'])) {
         $id = $_POST['id'];
-        $quantidade = $_POST['quantidade'];
+        $quantidade = filter_input(INPUT_POST, 'quantidade', FILTER_VALIDATE_INT);
 
-        $stmt = $pdo->prepare('UPDATE suprimentos SET quantidade = ? WHERE id = ?');
-        $stmt->execute([$quantidade, $id]);
+        if ($quantidade === false || $quantidade < 0) {
+            $error = "A quantidade deve ser um numero inteiro valido.";
+        } else {
+            $stmt = $pdo->prepare('UPDATE suprimentos SET quantidade = ? WHERE id = ?');
+            $stmt->execute([$quantidade, $id]);
+            header('Location: estoque');
+            exit;
+        }
     }
-    header('Location: estoque');
-    exit;
 }
 
 if (isset($_GET['delete'])) {

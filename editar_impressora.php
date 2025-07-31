@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/src/db/connection.php';
 require __DIR__ . '/src/actions/editar_impressora_actions.php';
+require_once __DIR__ . '/src/core/csrf.php';
 
 $stmt = $pdo->prepare('SELECT * FROM impressoras WHERE id = ?');
 $stmt->execute([$id]);
@@ -25,6 +26,7 @@ require 'layout/header.php';
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Detalhes da Impressora</h2>
     <form method="POST" action="editar_impressora?id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
             <label for="codigo" class="block text-sm font-semibold text-gray-700 mb-1">Codigo</label>
             <input type="text" name="codigo" id="codigo" value="<?= htmlspecialchars($impressora['codigo']) ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>

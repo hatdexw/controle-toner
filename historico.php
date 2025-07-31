@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/src/db/connection.php';
 
 require 'layout/header.php';
 

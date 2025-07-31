@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require __DIR__ . '/src/db/connection.php';
 
 // Fetch data from the database
 $stmt = $pdo->query(

@@ -107,4 +107,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Front-end validation for Add Impressora form
+    const addImpressoraForm = document.getElementById('addImpressoraForm');
+    if (addImpressoraForm) {
+        addImpressoraForm.addEventListener('submit', function(e) {
+            const codigo = document.getElementById('codigo').value.trim();
+            const modelo = document.getElementById('modelo').value.trim();
+            const localizacao = document.getElementById('localizacao').value.trim();
+
+            if (codigo === '' || modelo === '' || localizacao === '') {
+                e.preventDefault(); // Prevent form submission
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos Vazios',
+                    text: 'Por favor, preencha todos os campos obrigatórios.'
+                });
+            }
+        });
+    }
 });

@@ -21,7 +21,7 @@ if (isset($_SESSION['message'])) {
 
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Adicionar Nova Impressora</h2>
-    <form method="POST" action="impressoras" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+    <form method="POST" action="impressoras" id="addImpressoraForm" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
         <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
             <label for="codigo" class="block text-sm font-semibold text-gray-700 mb-1">Codigo</label>

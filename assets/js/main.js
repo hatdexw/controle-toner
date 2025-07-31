@@ -17,6 +17,12 @@ function showToast(icon, title) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Display messages from PHP
+    if (window.appMessage) {
+        showToast(window.appMessage.type, window.appMessage.text);
+        delete window.appMessage; // Clear the message after displaying
+    }
+
     // Handle delete impressora confirmation
     document.querySelectorAll('.delete-impressora').forEach(button => {
         button.addEventListener('click', function(e) {

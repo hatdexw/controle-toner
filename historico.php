@@ -3,13 +3,14 @@ require __DIR__ . '/src/db/connection.php';
 
 require 'layout/header.php';
 
-// Display toast messages
+// Prepare toast messages
 if (isset($_SESSION['message'])) {
     $message_type = $_SESSION['message']['type'];
     $message_text = $_SESSION['message']['text'];
-    echo "<script>showToast('$message_type', '$message_text');</script>";
+    echo "<script>window.appMessage = { type: '$message_type', text: '$message_text' };</script>";
     unset($_SESSION['message']);
 }
+
 
 // Obter todas as impressoras para o filtro
 $impressoras_filtro = $pdo->query('SELECT id, codigo, modelo FROM impressoras ORDER BY codigo')->fetchAll();

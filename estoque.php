@@ -8,11 +8,11 @@ $suprimentos = $stmt->fetchAll();
 
 require 'layout/header.php';
 
-// Display toast messages
+// Prepare toast messages
 if (isset($_SESSION['message'])) {
     $message_type = $_SESSION['message']['type'];
     $message_text = $_SESSION['message']['text'];
-    echo "<script>showToast('$message_type', '$message_text');</script>";
+    echo "<script>window.appMessage = { type: '$message_type', text: '$message_text' };</script>";
     unset($_SESSION['message']);
 }
 ?>

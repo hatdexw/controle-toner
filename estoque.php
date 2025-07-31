@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare('UPDATE suprimentos SET quantidade = ? WHERE id = ?');
         $stmt->execute([$quantidade, $id]);
     }
-    header('Location: estoque.php');
+    header('Location: estoque');
     exit;
 }
 
@@ -24,7 +24,7 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $pdo->prepare('DELETE FROM suprimentos WHERE id = ?');
     $stmt->execute([$id]);
-    header('Location: estoque.php');
+    header('Location: estoque');
     exit;
 }
 
@@ -104,7 +104,7 @@ require 'layout/header.php';
                             <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <a href="estoque.php?delete=<?= $suprimento['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este suprimento? Isso pode afetar o historico de trocas.')" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                            <a href="estoque?delete=<?= $suprimento['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir este suprimento? Isso pode afetar o historico de trocas.')" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>

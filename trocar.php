@@ -2,7 +2,7 @@
 require 'db.php';
 
 if (!isset($_GET['impressora_id'])) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Confirmar transacao
         $pdo->commit();
-        header('Location: index.php');
+        header('Location: index');
         exit;
 
     } catch (Exception $e) {
@@ -47,7 +47,7 @@ $stmt->execute([$impressora_id]);
 $impressora = $stmt->fetch();
 
 if (!$impressora) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -68,7 +68,7 @@ require 'layout/header.php';
 
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Impressora: <span class="text-indigo-600"><?= htmlspecialchars($impressora['codigo']) ?></span> - <?= htmlspecialchars($impressora['modelo']) ?> (<span class="text-gray-600"><?= htmlspecialchars($impressora['localizacao']) ?></span>)</h2>
-    <form method="POST" action="trocar.php?impressora_id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+    <form method="POST" action="trocar?impressora_id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
         <div>
             <label for="suprimento_id" class="block text-sm font-semibold text-gray-700 mb-1">Suprimento a ser utilizado</label>
             <select name="suprimento_id" id="suprimento_id" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base p-3 leading-normal transition-all duration-200" required>
@@ -89,7 +89,7 @@ require 'layout/header.php';
                 </svg>
                 Registrar Troca
             </button>
-            <a href="index.php" class="inline-flex justify-center items-center py-3 px-6 border border-gray-300 shadow-sm text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+            <a href="index" class="inline-flex justify-center items-center py-3 px-6 border border-gray-300 shadow-sm text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0L6 12.414l-1.293 1.293a1 1 0 01-1.414-1.414l2-2a1 1 0 011.414 0l2 2 1.293-1.293a1 1 0 011.414 1.414L9.707 14.707z" clip-rule="evenodd" />
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 2a8 8 0 100 16 8 8 0 000-16z" clip-rule="evenodd" />

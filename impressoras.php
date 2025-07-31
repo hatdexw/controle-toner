@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    header('Location: impressoras.php');
+    header('Location: impressoras');
     exit;
 }
 
@@ -25,7 +25,7 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $pdo->prepare('DELETE FROM impressoras WHERE id = ?');
     $stmt->execute([$id]);
-    header('Location: impressoras.php');
+    header('Location: impressoras');
     exit;
 }
 
@@ -45,7 +45,7 @@ require 'layout/header.php';
 
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Adicionar Nova Impressora</h2>
-    <form method="POST" action="impressoras.php" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+    <form method="POST" action="impressoras" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
         <div>
             <label for="codigo" class="block text-sm font-semibold text-gray-700 mb-1">Codigo</label>
             <input type="text" name="codigo" id="codigo" placeholder="Ex: COM-00001.000" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required>
@@ -86,13 +86,13 @@ require 'layout/header.php';
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($impressora['modelo']) ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($impressora['localizacao']) ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <a href="editar_impressora.php?id=<?= $impressora['id'] ?>" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                            <a href="editar_impressora?id=<?= $impressora['id'] ?>" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z" />
                                 </svg>
                                 Editar
                             </a>
-                            <a href="impressoras.php?delete=<?= $impressora['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir esta impressora?')" class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                            <a href="impressoras?delete=<?= $impressora['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir esta impressora?')" class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>

@@ -13,7 +13,7 @@
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-24">
     <nav class="bg-gray-800 shadow-lg py-4 px-6 fixed top-0 w-full z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="index.php" class="text-white text-2xl font-bold tracking-tight">Controle de Toners</a>
+            <a href="index" class="text-white text-2xl font-bold tracking-tight">Controle de Toners</a>
             <div class="flex space-x-4">
                 <?php
                 $current_page = basename($_SERVER['PHP_SELF']);
@@ -26,7 +26,8 @@
 
                 foreach ($nav_links as $url => $text) {
                     $active_class = ($current_page === $url) ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
-                    echo '<a href="' . $url . '" class="' . $active_class . ' px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">' . $text . '</a>';
+                    $url_without_ext = str_replace('.php', '', $url);
+                    echo '<a href="' . $url_without_ext . '" class="' . $active_class . ' px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">' . $text . '</a>';
                 }
                 ?>
             </div>

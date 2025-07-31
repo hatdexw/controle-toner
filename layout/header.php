@@ -6,9 +6,11 @@
     <title>Controle de Toners</title>
     <link href="./dist/output.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-24">
     <nav class="bg-gray-800 shadow-lg py-4 px-6 fixed top-0 w-full z-50">

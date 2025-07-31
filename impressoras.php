@@ -7,15 +7,17 @@ $stmt = $pdo->query('SELECT * FROM impressoras ORDER BY codigo');
 $impressoras = $stmt->fetchAll();
 
 require 'layout/header.php';
+
+// Display toast messages
+if (isset($_SESSION['message'])) {
+    $message_type = $_SESSION['message']['type'];
+    $message_text = $_SESSION['message']['text'];
+    echo "<script>showToast('$message_type', '$message_text');</script>";
+    unset($_SESSION['message']);
+}
 ?>
 
 <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Gerenciar Impressoras</h1>
-
-<?php if (isset($error)): ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
-        <span class="block sm:inline font-medium"><?= $error ?></span>
-    </div>
-<?php endif; ?>
 
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Adicionar Nova Impressora</h2>
@@ -44,8 +46,11 @@ require 'layout/header.php';
 
 <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Impressoras Cadastradas</h2>
+    <div class="mb-4">
+        <input type="text" id="searchImpressora" placeholder="Buscar impressora por codigo, modelo ou localizacao..." class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3">
+    </div>
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200" id="impressorasTable">
             <thead class="bg-gray-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo</th>
@@ -67,11 +72,18 @@ require 'layout/header.php';
                                 </svg>
                                 Editar
                             </a>
-                            <a href="impressoras?delete=<?= $impressora['id'] ?>" onclick="return confirm('Tem certeza que deseja excluir esta impressora?')" class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                            <a href="#" class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 delete-impressora" data-id="<?= $impressora['id'] ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>
                                 Excluir
+                            </a>
+                            <a href="gerenciar_compatibilidade?impressora_id=<?= $impressora['id'] ?>" class="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                                Suprimentos
                             </a>
                         </td>
                     </tr>

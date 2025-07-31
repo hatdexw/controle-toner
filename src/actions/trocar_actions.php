@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validate_csrf_token();
 
     if (empty($_POST['suprimento_id'])) {
-        $error = "Por favor, selecione um suprimento.";
+        $_SESSION['message'] = ['type' => 'error', 'text' => "Por favor, selecione um suprimento."];
     } else {
         $suprimento_id = $_POST['suprimento_id'];
         $data_troca = date('Y-m-d H:i:s'); // Data e hora atuais
@@ -34,12 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $pdo->commit();
+            $_SESSION['message'] = ['type' => 'success', 'text' => "Troca registrada com sucesso!"];
             header('Location: index');
             exit;
 
         } catch (Exception $e) {
             $pdo->rollBack();
-            $error = $e->getMessage();
+            $_SESSION['message'] = ['type' => 'error', 'text' => $e->getMessage()];
         }
     }
 }

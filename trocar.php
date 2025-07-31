@@ -13,11 +13,26 @@ if (!$impressora) {
     exit;
 }
 
-// Obter suprimentos disponiveis (quantidade > 0)
-$stmt = $pdo->query('SELECT id, modelo, tipo FROM suprimentos WHERE quantidade > 0 ORDER BY modelo');
+// Obter suprimentos disponiveis (quantidade > 0) e compativeis com a impressora
+$stmt = $pdo->prepare(
+    'SELECT s.id, s.modelo, s.tipo 
+     FROM suprimentos s
+     JOIN impressora_suprimento_compativel isc ON s.id = isc.suprimento_id
+     WHERE s.quantidade > 0 AND isc.impressora_id = ?
+     ORDER BY s.modelo'
+);
+$stmt->execute([$impressora_id]);
 $suprimentos = $stmt->fetchAll();
 
 require 'layout/header.php';
+
+// Display toast messages
+if (isset($_SESSION['message'])) {
+    $message_type = $_SESSION['message']['type'];
+    $message_text = $_SESSION['message']['text'];
+    echo "<script>showToast('$message_type', '$message_text');</script>";
+    unset($_SESSION['message']);
+}
 ?>
 
 <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Registrar Troca de Suprimento</h1>

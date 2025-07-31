@@ -3,6 +3,14 @@ require __DIR__ . '/src/db/connection.php';
 
 require 'layout/header.php';
 
+// Display toast messages
+if (isset($_SESSION['message'])) {
+    $message_type = $_SESSION['message']['type'];
+    $message_text = $_SESSION['message']['text'];
+    echo "<script>showToast('$message_type', '$message_text');</script>";
+    unset($_SESSION['message']);
+}
+
 $stmt = $pdo->query(
     'SELECT i.id, i.codigo, i.modelo, i.localizacao, h.data_troca, s.modelo as suprimento_modelo, s.tipo 
      FROM impressoras i 

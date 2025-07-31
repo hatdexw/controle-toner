@@ -13,6 +13,14 @@ if (!$impressora) {
 }
 
 require 'layout/header.php';
+
+// Display toast messages
+if (isset($_SESSION['message'])) {
+    $message_type = $_SESSION['message']['type'];
+    $message_text = $_SESSION['message']['text'];
+    echo "<script>showToast('$message_type', '$message_text');</script>";
+    unset($_SESSION['message']);
+}
 ?>
 
 <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Editar Impressora</h1>

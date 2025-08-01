@@ -51,14 +51,6 @@ $stmt = $pdo->query(
                         </div>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <p class="text-sm font-semibold text-gray-700 mb-1">Fotocondutor:</p>
-                    <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 overflow-hidden">
-                        <div class="bg-green-600 h-full rounded-full flex items-center justify-center" style="width: <?= $impressora['fotocondutor_status'] ?>%">
-                            <span class="text-xs font-bold text-white"><?= $impressora['fotocondutor_status'] ?>%</span>
-                        </div>
-                    </div>
-                </div>
             <?php endif; ?>
 
             <div class="bg-gray-50 p-4 rounded-lg mb-6 flex-grow">

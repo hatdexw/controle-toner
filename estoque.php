@@ -21,7 +21,7 @@ if (isset($_SESSION['message'])) {
 
 <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Adicionar Novo Suprimento</h2>
-    <form method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+    <form method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end items-center">
         <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
             <label for="modelo" class="block text-sm font-semibold text-gray-700 mb-1">Modelo do Suprimento</label>
@@ -40,10 +40,10 @@ if (isset($_SESSION['message'])) {
             <label for="quantidade" class="block text-sm font-semibold text-gray-700 mb-1">Quantidade</label>
             <input type="number" name="quantidade" id="quantidade" placeholder="0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required min="0">
         </div>
-        <div>
+        <!-- <div>
             <label for="quantidade_minima" class="block text-sm font-semibold text-gray-700 mb-1">Qtd. Minima</label>
             <input type="number" name="quantidade_minima" id="quantidade_minima" placeholder="5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3" required min="0">
-        </div>
+        </div> -->
         <button type="submit" name="add_suprimento" class="inline-flex justify-center items-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -65,7 +65,7 @@ if (isset($_SESSION['message'])) {
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd. Minima</th>
+                    <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd. Minima</th> -->
                     <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acoes</th>
                 </tr>
             </thead>
@@ -88,7 +88,7 @@ if (isset($_SESSION['message'])) {
                                 </button>
                             </form>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($suprimento['quantidade_minima']) ?></td>
+                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($suprimento['quantidade_minima']) ?></td> -->
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200 delete-suprimento" data-id="<?= $suprimento['id'] ?>">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -98,7 +98,7 @@ if (isset($_SESSION['message'])) {
                             </a>
                         </td>
                     </tr>
-                    <?php if ($suprimento['quantidade'] <= $suprimento['quantidade_minima']) : ?>
+                    <!-- <?php if ($suprimento['quantidade'] <= $suprimento['quantidade_minima']) : ?>
                         <tr class="bg-red-50">
                             <td colspan="5" class="px-6 py-2 whitespace-nowrap text-sm text-red-600 font-semibold text-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline-block" viewBox="0 0 20 20" fill="currentColor">
@@ -107,7 +107,7 @@ if (isset($_SESSION['message'])) {
                                 Estoque baixo! (Minimo: <?= $suprimento['quantidade_minima'] ?>)
                             </td>
                         </tr>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
                 <?php endforeach; ?>
             </tbody>
         </table>

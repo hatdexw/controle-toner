@@ -12,7 +12,7 @@ if (isset($_SESSION['message'])) {
 }
 
 $stmt = $pdo->query(
-    'SELECT i.id, i.codigo, i.modelo, i.localizacao, h.data_troca, s.modelo as suprimento_modelo, s.tipo 
+    'SELECT i.id, i.codigo, i.modelo, i.localizacao, i.toner_status, i.fotocondutor_status, h.data_troca, s.modelo as suprimento_modelo, s.tipo 
      FROM impressoras i 
      LEFT JOIN (SELECT impressora_id, MAX(data_troca) as max_data FROM historico_trocas GROUP BY impressora_id) as ht 
      ON i.id = ht.impressora_id
@@ -41,6 +41,25 @@ $stmt = $pdo->query(
             </div>
             
             <p class="text-gray-700 text-base mb-4">Localizacao: <span class="font-semibold"><?= htmlspecialchars($impressora['localizacao']) ?></span></p>
+
+            <?php if ($impressora['modelo'] === 'HP LaserJet MFP M132fw') : ?>
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-1">Toner:</p>
+                    <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 overflow-hidden">
+                        <div class="bg-blue-600 h-full rounded-full flex items-center justify-center" style="width: <?= $impressora['toner_status'] ?>%">
+                            <span class="text-xs font-bold text-white"><?= $impressora['toner_status'] ?>%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-1">Fotocondutor:</p>
+                    <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 overflow-hidden">
+                        <div class="bg-green-600 h-full rounded-full flex items-center justify-center" style="width: <?= $impressora['fotocondutor_status'] ?>%">
+                            <span class="text-xs font-bold text-white"><?= $impressora['fotocondutor_status'] ?>%</span>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="bg-gray-50 p-4 rounded-lg mb-6 flex-grow">
                 <?php if ($impressora['data_troca']) : ?>

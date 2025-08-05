@@ -17,18 +17,18 @@ function generate_csrf_token(): string
 }
 
 /**
- * Validates the submitted CSRF token.
- * Kills the script with a 403 error if validation fails.
+ * Verifies the submitted CSRF token against the one in the session.
+ * @param string $token The token submitted by the user.
+ * @return bool True if the token is valid, false otherwise.
  */
-function validate_csrf_token(): void
+function verify_csrf_token(string $token): bool
 {
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        // Token is invalid or missing, kill the script.
+    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
         error_log('CSRF token validation failed.');
-        http_response_code(403);
-        die('Erro de seguranca: Token CSRF invalido.');
+        return false;
     }
     
-    // Token is valid, unset it to prevent reuse (optional but good practice)
+    // Token is valid, unset it to prevent reuse
     unset($_SESSION['csrf_token']);
+    return true;
 }

@@ -12,7 +12,9 @@ if (isset($_SESSION['message'])) {
 }
 
 $stmt = $pdo->query(
-    'SELECT i.id, i.codigo, i.modelo, i.localizacao, i.toner_status, i.fotocondutor_status, h.data_troca, s.modelo as suprimento_modelo, s.tipo 
+    'SELECT i.id, i.codigo, i.modelo, i.localizacao, i.toner_status, 
+            i.ink_black, i.ink_cyan, i.ink_magenta, i.ink_yellow, i.ink_photo_black, i.ink_gray, 
+            h.data_troca, s.modelo as suprimento_modelo, s.tipo 
      FROM impressoras i 
      LEFT JOIN (SELECT impressora_id, MAX(data_troca) as max_data FROM historico_trocas GROUP BY impressora_id) as ht 
      ON i.id = ht.impressora_id
@@ -42,7 +44,40 @@ $stmt = $pdo->query(
             
             <p class="text-gray-700 text-base mb-4">Localizacao: <span class="font-semibold"><?= htmlspecialchars($impressora['localizacao']) ?></span></p>
 
-            <?php if ($impressora['modelo'] === 'HP LaserJet MFP M132fw') : ?>
+            <?php 
+            $modelo_upper = strtoupper($impressora['modelo']);
+            // Lógica para Epson L8180
+            if (strpos($modelo_upper, 'L8180') !== false) : 
+                $inks = [
+                    'Preto Foto' => ['level' => $impressora['ink_photo_black'], 'color' => 'bg-gray-700'],
+                    'Preto' => ['level' => $impressora['ink_black'], 'color' => 'bg-black'],
+                    'Ciano' => ['level' => $impressora['ink_cyan'], 'color' => 'bg-cyan-500'],
+                    'Magenta' => ['level' => $impressora['ink_magenta'], 'color' => 'bg-fuchsia-600'],
+                    'Amarelo' => ['level' => $impressora['ink_yellow'], 'color' => 'bg-yellow-400'],
+                    'Cinza' => ['level' => $impressora['ink_gray'], 'color' => 'bg-gray-400'],
+                ];
+            ?>
+                <div class="mb-4 flex justify-center">
+                    <div class="flex space-x-4 h-24 items-end">
+                        <?php foreach ($inks as $name => $details): ?>
+                            <?php 
+                            $level = $details['level'] !== null ? $details['level'] : 0; 
+                            $color = $details['color'];
+                            ?>
+                                <div class="flex flex-col items-center h-full justify-end">
+                                    <div class="relative w-6 bg-gray-200 h-full overflow-hidden flex flex-col justify-end">
+                                        <div class="<?= $color ?> w-full flex items-center justify-center" style="height: <?= max(1, $level) ?>%">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs font-medium text-gray-600 mt-2 text-center"><?= $name ?></p>
+                                </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php 
+            // Lógica para HP e Brother
+            elseif (strpos($modelo_upper, 'HP') !== false || strpos($modelo_upper, 'BROTHER') !== false) : 
+            ?>
                 <div class="mb-4">
                     <p class="text-sm font-semibold text-gray-700 mb-1">Toner:</p>
                     <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 overflow-hidden">

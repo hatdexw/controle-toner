@@ -1,72 +1,152 @@
 <?php
 require_once __DIR__ . '/../db/connection.php';
 
-// Verifica se a extensão SNMP está habilitada
 if (!extension_loaded('snmp')) {
-    die("Erro: A extensão SNMP do PHP não está habilitada. Por favor, habilite-a no seu php.ini.\n");
+    die("❌ Erro: A extensão SNMP do PHP não está habilitada. Ative no php.ini\n");
 }
 
-echo "Iniciando a atualização do status do toner das impressoras...\n";
+echo "🔄 Iniciando a atualização do status do toner das impressoras...\n";
 
-// OID para o nível do toner (exemplo: 1.3.6.1.2.1.43.11.1.1.9.1.1)
-$oid_toner_level = '1.3.6.1.2.1.43.11.1.1.9.1.1';
-$community_string = 'public'; // Community string padrão
+$community_string = 'public';
 
 try {
-    // 1. Obter todas as impressoras do banco de dados
-    $stmt = $pdo->query('SELECT id, modelo, ip_address FROM impressoras WHERE ip_address IS NOT NULL');
+    $stmt = $pdo->query("SELECT id, modelo, ip_address FROM impressoras WHERE ip_address IS NOT NULL");
     $impressoras = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($impressoras)) {
-        echo "Nenhuma impressora encontrada com endereço IP.\n";
+        echo "⚠️ Nenhuma impressora encontrada com endereço IP.\n";
         exit;
     }
 
     foreach ($impressoras as $impressora) {
-        $impressora_id = $impressora['id'];
-        $modelo = $impressora['modelo'];
-        $ip_address = $impressora['ip_address'];
+        $id = $impressora['id'];
+        $modelo = strtoupper($impressora['modelo']);
+        $ip = $impressora['ip_address'];
 
-        echo "\nProcessando impressora: {$modelo} (IP: {$ip_address})...\n";
+        echo "\n🖨️ Processando: $modelo (IP: $ip)\n";
 
-        // Tenta obter o status do toner via SNMP
-        $toner_level = null;
-        try {
-            // snmpget(hostname, community, oid, timeout, retries)
-            $result = snmpget($ip_address, $community_string, $oid_toner_level, 1000000, 1); // Timeout em microssegundos (1 segundo)
+        if (strpos($modelo, 'L8180') !== false) {
+            try {
+                // Mapeamento das descrições para nomes internos (copiado do teste.php)
+                $color_map = [
+                    'photo black ink bottle' => 'ink_photo_black',
+                    'black ink bottle'       => 'ink_black',
+                    'cyan ink bottle'        => 'ink_cyan',
+                    'magenta ink bottle'     => 'ink_magenta',
+                    'yellow ink bottle'      => 'ink_yellow',
+                    'gray ink bottle'        => 'ink_gray',
+                ];
 
-            if ($result !== false) {
-                // O resultado pode vir como 'INTEGER: 50' ou 'STRING: 50'
-                // Extrai apenas o valor numérico
-                if (preg_match('/(\d+)/', $result, $matches)) {
-                    $toner_level = (int)$matches[1];
-                    echo "Status do Toner obtido: {$toner_level}%\n";
-                } else {
-                    echo "Não foi possível extrair o nível numérico do toner de: {$result}\n";
+                // OIDs padrão SNMP para suprimentos (copiado do teste.php)
+                $oid_descr = '1.3.6.1.2.1.43.11.1.1.6.1'; // descrição do toner
+                $oid_level = '1.3.6.1.2.1.43.11.1.1.9.1'; // nível atual
+                $oid_max   = '1.3.6.1.2.1.43.11.1.1.8.1'; // capacidade total
+
+                // Lê descrições dos suprimentos (copiado do teste.php)
+                $descriptions = @snmpwalk($ip, $community_string, $oid_descr);
+                $levels       = @snmpwalk($ip, $community_string, $oid_level);
+                $capacities   = @snmpwalk($ip, $community_string, $oid_max);
+
+                // Debug: Verifica se recebeu algo
+                if (!$descriptions || !$levels || !$capacities) {
+                    echo "❌ Erro: Falha ao coletar informações SNMP para Epson. Verifique IP ou permissões SNMP.\n";
+                    continue;
                 }
-            } else {
-                echo "Erro ao obter status do Toner via SNMP para {$ip_address}. Verifique o IP, community string ou se a impressora está online.\n";
-            }
-        } catch (Exception $e) {
-            echo "Exceção SNMP para {$ip_address}: " . $e->getMessage() . "\n";
-        }
 
-        // 2. Atualizar o status do toner no banco de dados
-        if ($toner_level !== null) {
-            $update_stmt = $pdo->prepare('UPDATE impressoras SET toner_status = ? WHERE id = ?');
-            $update_stmt->execute([$toner_level, $impressora_id]);
-            echo "Status do Toner atualizado no banco de dados para {$toner_level}% para a impressora ID {$impressora_id}.\n";
+                $ink_levels = [];
+                foreach ($descriptions as $i => $desc_raw) {
+                    preg_match('/STRING: \"(.*)\"/i', $desc_raw, $match);
+                    $desc = strtolower(trim($match[1] ?? ''));
+
+                    if (isset($color_map[$desc])) {
+                        $key = $color_map[$desc];
+
+                        // Extrai os números
+                        preg_match('/INTEGER: (\d+)/', $levels[$i] ?? '', $level_match);
+                        preg_match('/INTEGER: (\d+)/', $capacities[$i] ?? '', $max_match);
+
+                        $level = isset($level_match[1]) ? (int)$level_match[1] : 0;
+                        $max   = isset($max_match[1])   ? (int)$max_match[1]   : 100;
+
+                        $percent = $max > 0 ? round(($level / $max) * 100) : 0;
+
+                        $ink_levels[$key] = $percent;
+                    }
+                }
+
+                if (!empty($ink_levels)) {
+                    $cols = [];
+                    $vals = [];
+                    foreach ($ink_levels as $col => $val) {
+                        $cols[] = "$col = ?";
+                        $vals[] = $val;
+                    }
+                    $vals[] = $id;
+
+                    $sql = "UPDATE impressoras SET " . implode(', ', $cols) . " WHERE id = ?";
+                    $pdo->prepare($sql)->execute($vals);
+                    echo "💾 Níveis de tinta da Epson atualizados no banco de dados.\n";
+                } else {
+                    echo "⚠️ Nenhum nível de tinta foi coletado para a Epson.\n";
+                }
+
+            } catch (Exception $e) {
+                echo "❌ Exceção SNMP para a impressora Epson $ip: " . $e->getMessage() . "\n";
+            }
+
+        } elseif (strpos($modelo, 'BROTHER') !== false) {
+            try {
+                $oid = '1.3.6.1.4.1.2435.2.3.9.4.2.1.5.5.8.0';
+                $result = @snmpget($ip, $community_string, $oid);
+
+                if ($result !== false) {
+                    $hex = preg_replace('/^.*?:\\s*/', '', $result);
+                    $hex = str_replace(' ', '', $hex);
+                    $identifier = '81';
+
+                    $pos = strpos($hex, $identifier);
+                    if ($pos !== false) {
+                        $toner_hex = substr($hex, $pos + 12, 2);
+                        $toner = hexdec($toner_hex);
+
+                        $pdo->prepare("UPDATE impressoras SET toner_status = ? WHERE id = ?")
+                            ->execute([$toner, $id]);
+
+                        echo "✅ Toner Brother atualizado: $toner%\n";
+                    } else {
+                        echo "⚠️ Não foi possível localizar o identificador do toner na string.\n";
+                    }
+                } else {
+                    echo "❌ SNMP falhou para Brother $ip.\n";
+                }
+            } catch (Exception $e) {
+                 echo "❌ Exceção SNMP para a impressora Brother $ip: " . $e->getMessage() . "\n";
+            }
+
         } else {
-            echo "Status do Toner não atualizado para a impressora ID {$impressora_id} devido a falha na leitura SNMP.\n";
+            try {
+                $oid = '1.3.6.1.2.1.43.11.1.1.9.1.1';
+                $result = @snmpget($ip, $community_string, $oid);
+
+                if ($result !== false && preg_match('/\d+/', $result, $match)) {
+                    $toner = (int)$match[0];
+                    $pdo->prepare("UPDATE impressoras SET toner_status = ? WHERE id = ?")
+                        ->execute([$toner, $id]);
+
+                    echo "✅ Toner atualizado: $toner%\n";
+                } else {
+                    echo "⚠️ Não foi possível obter o nível de toner para modelo genérico.\n";
+                }
+            } catch (Exception $e) {
+                echo "❌ Exceção SNMP para a impressora $ip: " . $e->getMessage() . "\n";
+            }
         }
     }
 
-    echo "\nAtualização do status do toner concluída.\n";
+    echo "\n✅ Atualização finalizada.\n";
 
 } catch (PDOException $e) {
-    die("Erro de banco de dados: " . $e->getMessage() . "\n");
+    die("❌ Erro no banco de dados: " . $e->getMessage() . "\n");
 } catch (Exception $e) {
-    die("Erro inesperado: " . $e->getMessage() . "\n");
+    die("❌ Erro inesperado: " . $e->getMessage() . "\n");
 }
-
-?>

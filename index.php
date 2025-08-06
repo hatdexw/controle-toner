@@ -26,6 +26,7 @@ $router->add('/controle-toner/historico', 'historico.php');
 $router->add('/controle-toner/trocar', 'trocar.php');
 $router->add('/controle-toner/editar_impressora', 'editar_impressora.php');
 $router->add('/controle-toner/gerenciar_compatibilidade', 'gerenciar_compatibilidade.php');
+$router->add('/controle-toner/export_pdf', 'export_pdf.php');
 
 // Obtém a URI da requisição
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

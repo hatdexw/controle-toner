@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/src/db/connection.php';
-require('fpdf/fpdf.php'); // Adjust path if FPDF is in a different location
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Funcao para remover acentos e caracteres especiais
 function remove_accents($string) {

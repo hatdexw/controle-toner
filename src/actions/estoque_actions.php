@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
         $_SESSION['message'] = ['type' => 'error', 'text' => 'Falha na verificação de segurança.'];
-        header('Location: /controle-toner/estoque.php');
+        header('Location: /controle-toner/estoque');
         exit;
     }
 
@@ -46,6 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header('Location: /controle-toner/estoque.php');
+    header('Location: /controle-toner/estoque');
     exit;
 }

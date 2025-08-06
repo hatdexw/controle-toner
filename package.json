@@ -4,8 +4,9 @@
   "description": "Sistema de controle de toner",
   "main": "index.php",
   "scripts": {
-    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
-    "build:prod:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify"
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build:prod": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify"
   },
   "keywords": [],
   "author": "",

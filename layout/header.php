@@ -18,18 +18,28 @@
             <a href="index" class="text-white text-2xl font-bold tracking-tight">Controle de Toners</a>
             <div class="flex space-x-4">
                 <?php
-                $current_page = basename($_SERVER['PHP_SELF']);
+                $current_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                // Normaliza a URI para corresponder às rotas do roteador
+                if (substr($current_uri, -6) === '/index') {
+                    $current_uri = substr($current_uri, 0, -6); // Remove /index
+                }
+                if ($current_uri === '/controle-toner') {
+                    $current_uri = '/controle-toner/';
+                }
+                if ($current_uri !== '/controle-toner/') {
+                    $current_uri = rtrim($current_uri, '/');
+                }
+
                 $nav_links = [
-                    'index.php' => 'Impressoras',
-                    'estoque.php' => 'Estoque',
-                    'impressoras.php' => 'Gerenciar',
-                    'historico.php' => 'Historico',
+                    '/controle-toner/' => 'Impressoras',
+                    '/controle-toner/estoque' => 'Estoque',
+                    '/controle-toner/impressoras' => 'Gerenciar',
+                    '/controle-toner/historico' => 'Historico',
                 ];
 
                 foreach ($nav_links as $url => $text) {
-                    $active_class = ($current_page === $url) ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
-                    $url_without_ext = str_replace('.php', '', $url);
-                    echo '<a href="' . $url_without_ext . '" class="' . $active_class . ' px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">' . $text . '</a>';
+                    $active_class = ($current_uri === $url) ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
+                    echo '<a href="' . $url . '" class="' . $active_class . ' px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">' . $text . '</a>';
                 }
                 ?>
             </div>

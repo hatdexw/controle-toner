@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../layout/header.php';
 ?>
 
-<div class="flex flex-col items-center justify-center h-screen bg-gray-100">
+<div class="flex flex-col items-center justify-center flex-grow bg-gray-100">
     <h1 class="text-9xl font-extrabold text-indigo-600">Manutenção</h1>
     <p class="text-2xl md:text-3xl font-light text-gray-800 mb-4">
         Página em Manutenção.

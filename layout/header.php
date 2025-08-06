@@ -12,7 +12,7 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-24">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-16">
     <nav class="bg-gray-800 shadow-lg py-4 px-6 fixed top-0 w-full z-50">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index" class="text-white text-2xl font-bold tracking-tight">Controle de Toners</a>
@@ -45,4 +45,4 @@
             </div>
         </div>
     </nav>
-    <main class="flex-grow container mx-auto p-6">
+    <main class="flex-grow container mx-auto p-6 flex items-center justify-center">

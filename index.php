@@ -80,9 +80,10 @@ $stmt = $pdo->query(
             ?>
                 <div class="mb-4">
                     <p class="text-sm font-semibold text-gray-700 mb-1">Toner:</p>
-                    <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 overflow-hidden">
-                        <div class="bg-blue-600 h-full rounded-full flex items-center justify-center" style="width: <?= $impressora['toner_status'] ?>%">
-                            <span class="text-xs font-bold text-white"><?= $impressora['toner_status'] ?>%</span>
+                    <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
+                        <div class="absolute top-0 right-0 h-full bg-blue-600 rounded-full" style="width: <?= $impressora['toner_status'] ?>%;"></div>
+                        <div class="relative flex items-center justify-center h-full">
+                            <span class="font-bold text-xs text-white"><?= $impressora['toner_status'] ?>%</span>
                         </div>
                     </div>
                 </div>

@@ -28,9 +28,33 @@ $stmt = $pdo->query(
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <?php while ($impressora = $stmt->fetch()) {
     ?>
-        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 flex flex-col transform transition-transform duration-300 hover:scale-105">
+        <?php
+        $toner_status = $impressora['toner_status'];
+        $modelo_upper = strtoupper($impressora['modelo']);
+        
+        $is_special_hp = ($modelo_upper === 'IMPRESSORA HP 4003DW PRO');
+        $is_toner_printer = !$is_special_hp && (strpos($modelo_upper, 'HP') !== false || strpos($modelo_upper, 'BROTHER') !== false);
+        $is_l8180 = strpos($modelo_upper, 'L8180') !== false;
+
+        $is_empty = $is_toner_printer && $toner_status !== null && $toner_status == 0;
+
+        // Classes dinâmicas baseadas no status
+        if ($is_special_hp) {
+            $card_classes = 'bg-yellow-50 border-yellow-500';
+            $icon_classes = 'text-yellow-600';
+        } elseif ($is_empty) {
+            $card_classes = 'bg-red-50 border-red-500 animate-pulse';
+            $icon_classes = 'text-red-600';
+        } else {
+            $card_classes = 'bg-white border-gray-200';
+            $icon_classes = 'text-indigo-600';
+        }
+        
+        $toner_bar_class = $is_empty ? 'bg-red-600' : 'bg-blue-600';
+        ?>
+        <div class="rounded-xl shadow-lg p-6 border flex flex-col transform transition-transform duration-300 hover:scale-105 <?= $card_classes ?>">
             <div class="flex items-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-600 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-4 <?= $icon_classes ?>" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
                 <div>
@@ -42,8 +66,13 @@ $stmt = $pdo->query(
             <p class="text-gray-700 text-base mb-4">Localizacao: <span class="font-semibold"><?= htmlspecialchars($impressora['localizacao']) ?></span></p>
 
             <?php 
-            $modelo_upper = strtoupper($impressora['modelo']);
-            if (strpos($modelo_upper, 'L8180') !== false) : 
+            if ($is_special_hp) : 
+            ?>
+                <div class="mb-4 p-4 bg-yellow-100 rounded-lg">
+                    <p class="text-center font-semibold text-yellow-800">Toner não original encontrado</p>
+                </div>
+            <?php
+            elseif ($is_l8180) : 
                 $inks = [
                     'Preto Foto' => ['level' => $impressora['ink_photo_black'], 'color' => 'bg-gray-700'],
                     'Preto' => ['level' => $impressora['ink_black'], 'color' => 'bg-black'],
@@ -71,16 +100,19 @@ $stmt = $pdo->query(
                     </div>
                 </div>
             <?php 
-            elseif (strpos($modelo_upper, 'HP') !== false || strpos($modelo_upper, 'BROTHER') !== false) : 
+            elseif ($is_toner_printer) : 
             ?>
                 <div class="mb-4">
                     <p class="text-sm font-semibold text-gray-700 mb-1">Toner:</p>
                     <div class="relative w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700">
-                        <div class="absolute top-0 right-0 h-full bg-blue-600 rounded-full" style="width: <?= $impressora['toner_status'] ?>%;"></div>
+                        <div class="absolute top-0 right-0 h-full <?= $toner_bar_class ?> rounded-full" style="width: <?= $toner_status ?? 0 ?>%;"></div>
                         <div class="relative flex items-center justify-center h-full">
-                            <span class="font-bold text-xs text-white"><?= $impressora['toner_status'] ?>%</span>
+                            <span class="font-bold text-xs text-white"><?= $toner_status ?? 0 ?>%</span>
                         </div>
                     </div>
+                    <?php if ($is_empty): ?>
+                        <p class="text-red-600 font-bold text-sm mt-1 text-center">Toner Vazio!</p>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 

@@ -70,8 +70,7 @@ class PDF extends FPDF
         $this->SetFont('','B', 9);
 
         // Larguras das colunas (total 190mm para A4 com margens de 10mm)
-        // Larguras das colunas ajustadas b(total 190mm)
-        $w = array(30, 25, 40, 30, 45, 20);
+        $w = array(28, 22, 50, 25, 50, 15);
         
         // Cabecalho
         for($i=0;$i<count($header);$i++)
@@ -81,7 +80,7 @@ class PDF extends FPDF
         // Restauracao de cores e fontes
         $this->SetFillColor(240, 245, 255); // Fundo azul bem claro para linhas
         $this->SetTextColor(0); // Texto preto
-        $this->SetFont('','', 8);
+        $this->SetFont('','', 7.5); // Reduzido o tamanho da fonte
 
         // Dados
         $fill = false;

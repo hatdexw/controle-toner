@@ -2,8 +2,17 @@
 require_once __DIR__ . '/../db/connection.php';
 require_once __DIR__ . '/../core/csrf.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    validate_csrf_token();
+    // Validacao CSRF
+    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['message'] = ['type' => 'error', 'text' => 'Falha na verificação de segurança.'];
+        header('Location: /controle-toner/impressoras');
+        exit;
+    }
 
     if (isset($_POST['add_impressora'])) {
         // Server-side validation
@@ -27,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    header('Location: impressoras');
+    header('Location: /controle-toner/impressoras');
     exit;
 } elseif (isset($_GET['delete'])) {
     // For GET requests like delete, we should add CSRF protection as well.
@@ -41,6 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (PDOException $e) {
         $_SESSION['message'] = ['type' => 'error', 'text' => "Erro ao excluir impressora."];
     }
-    header('Location: impressoras');
+    header('Location: /controle-toner/impressoras');
     exit;
 }

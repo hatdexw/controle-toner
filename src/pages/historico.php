@@ -59,22 +59,24 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
 
 ?>
 
-<h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Historico de Trocas</h1>
+<h1 class="section-title">Historico de Trocas</h1>
 
-<div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Filtrar Historico</h2>
+<div class="glass-card p-8 mb-8 anim-hover-lift">
+    <div class="card-header mb-4">
+        <h2 class="card-title">Filtrar Historico</h2>
+    </div>
     <form method="GET" action="/controle-toner/historico" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
         <div>
-            <label for="data_inicio" class="block text-sm font-semibold text-gray-700 mb-1">Data Inicio</label>
-            <input type="date" name="data_inicio" id="data_inicio" value="<?= htmlspecialchars($_GET['data_inicio'] ?? '') ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3">
+            <label for="data_inicio" class="field-label">Data Início</label>
+            <input type="date" name="data_inicio" id="data_inicio" value="<?= htmlspecialchars($_GET['data_inicio'] ?? '') ?>" class="form-input">
         </div>
         <div>
-            <label for="data_fim" class="block text-sm font-semibold text-gray-700 mb-1">Data Fim</label>
-            <input type="date" name="data_fim" id="data_fim" value="<?= htmlspecialchars($_GET['data_fim'] ?? '') ?>" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3">
+            <label for="data_fim" class="field-label">Data Fim</label>
+            <input type="date" name="data_fim" id="data_fim" value="<?= htmlspecialchars($_GET['data_fim'] ?? '') ?>" class="form-input">
         </div>
         <div>
-            <label for="impressora_id" class="block text-sm font-semibold text-gray-700 mb-1">Impressora</label>
-            <select name="impressora_id" id="impressora_id" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3">
+            <label for="impressora_id" class="field-label">Impressora</label>
+            <select name="impressora_id" id="impressora_id" class="form-select">
                 <option value="">Todas</option>
                 <?php foreach ($impressoras_filtro as $imp) : ?>
                     <option value="<?= $imp['id'] ?>" <?= (isset($_GET['impressora_id']) && $_GET['impressora_id'] == $imp['id']) ? 'selected' : '' ?>><?= htmlspecialchars($imp['codigo']) ?> - <?= htmlspecialchars($imp['modelo']) ?></option>
@@ -82,60 +84,61 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
             </select>
         </div>
         <div>
-            <label for="suprimento_id" class="block text-sm font-semibold text-gray-700 mb-1">Suprimento</label>
-            <select name="suprimento_id" id="suprimento_id" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3">
+            <label for="suprimento_id" class="field-label">Suprimento</label>
+            <select name="suprimento_id" id="suprimento_id" class="form-select">
                 <option value="">Todos</option>
                 <?php foreach ($suprimentos_filtro as $sup) : ?>
                     <option value="<?= $sup['id'] ?>" <?= (isset($_GET['suprimento_id']) && $_GET['suprimento_id'] == $sup['id']) ? 'selected' : '' ?>><?= htmlspecialchars($sup['modelo']) ?> (<?= htmlspecialchars($sup['tipo']) ?>)</option>
                 <?php endforeach; ?>
             </select>
         </div>
-        <button type="submit" class="inline-flex justify-center items-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm2 0v14h10V3H5zm2 2a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm0 4a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm0 4a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" clip-rule="evenodd" />
-            </svg>
-            Filtrar
-        </button>
+        <div class="flex gap-3 md:col-span-1 mt-1">
+            <button type="submit" class="primary-btn w-full justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2H3V4zm0 4h14v2H3V8zm0 4h14v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd" /></svg>
+                <span>Filtrar</span>
+            </button>
+        </div>
     </form>
 </div>
 
-<div class="mb-6 flex space-x-4 justify-end">
-    <a href="<?= $pdf_export_link ?>" target="_blank" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0113 3.414L16.586 7A2 2 0 0117 8.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 3a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd" />
-        </svg>
-        Exportar para PDF
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <p class="text-sm text-gray-500 dark:text-gray-400"><?= count($historico) ?> registro(s) encontrado(s)</p>
+    <a href="<?= $pdf_export_link ?>" target="_blank" class="primary-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h5v-2H4V4h12v5h2V4a2 2 0 00-2-2H4zm9 9V7h2l-3-4-3 4h2v4h2zm-5 2v2h2v-2H8z" clip-rule="evenodd" /></svg>
+        <span>Exportar PDF</span>
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Registros de Trocas</h2>
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+<div class="glass-card p-8 overflow-hidden">
+    <div class="card-header mb-4">
+        <h2 class="card-title">Registros de Trocas</h2>
+    </div>
+    <div class="overflow-x-auto rounded-xl ring-1 ring-black/5 dark:ring-white/10">
+        <table class="table-base">
+            <thead class="table-head-row">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo Imp.</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo Imp.</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localizacao</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suprimento</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th class="table-head-cell">Data</th>
+                    <th class="table-head-cell">Codigo Imp.</th>
+                    <th class="table-head-cell">Modelo Imp.</th>
+                    <th class="table-head-cell">Localizacao</th>
+                    <th class="table-head-cell">Suprimento</th>
+                    <th class="table-head-cell">Tipo</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                 <?php if (empty($historico)) : ?>
                     <tr>
-                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum registro encontrado com os filtros aplicados.</td>
+                        <td colspan="6" class="table-cell text-center text-gray-500 dark:text-gray-400">Nenhum registro encontrado com os filtros aplicados.</td>
                     </tr>
                 <?php else : ?>
                     <?php foreach ($historico as $troca) : ?>
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?= date('d/m/Y H:i', strtotime($troca['data_troca'])) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($troca['codigo']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($troca['impressora_modelo']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($troca['localizacao']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($troca['suprimento_modelo']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($troca['tipo']) ?></td>
+                        <tr class="table-row">
+                            <td class="table-cell font-medium text-gray-900 dark:text-gray-100"><?= date('d/m/Y H:i', strtotime($troca['data_troca'])) ?></td>
+                            <td class="table-cell"><?= htmlspecialchars($troca['codigo']) ?></td>
+                            <td class="table-cell"><?= htmlspecialchars($troca['impressora_modelo']) ?></td>
+                            <td class="table-cell"><?= htmlspecialchars($troca['localizacao']) ?></td>
+                            <td class="table-cell"><?= htmlspecialchars($troca['suprimento_modelo']) ?></td>
+                            <td class="table-cell"><?= htmlspecialchars($troca['tipo']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

@@ -2,8 +2,12 @@
 require_once __DIR__ . '/../db/connection.php';
 require_once __DIR__ . '/../core/csrf.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (!isset($_GET['impressora_id'])) {
-    header('Location: impressoras');
+    header('Location: /controle-toner/impressoras');
     exit;
 }
 
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     // Redirecionar para evitar reenvio do formulario
-    header('Location: gerenciar_compatibilidade?impressora_id=' . $impressora_id);
+    header('Location: /controle-toner/gerenciar_compatibilidade?impressora_id=' . $impressora_id);
     exit;
 }
 
@@ -50,7 +54,7 @@ $stmt->execute([$impressora_id]);
 $impressora = $stmt->fetch();
 
 if (!$impressora) {
-    header('Location: impressoras');
+    header('Location: /controle-toner/impressoras');
     exit;
 }
 

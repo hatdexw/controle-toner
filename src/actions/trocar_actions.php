@@ -2,8 +2,12 @@
 require_once __DIR__ . '/../db/connection.php';
 require_once __DIR__ . '/../core/csrf.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (!isset($_GET['impressora_id'])) {
-    header('Location: index');
+    header('Location: /controle-toner/');
     exit;
 }
 
@@ -39,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $pdo->commit();
                 $_SESSION['message'] = ['type' => 'success', 'text' => "Troca registrada com sucesso!"];
-                header('Location: index');
+                header('Location: /controle-toner/');
                 exit;
 
             } catch (Exception $e) {

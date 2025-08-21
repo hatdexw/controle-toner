@@ -2,8 +2,12 @@
 require_once __DIR__ . '/../db/connection.php';
 require_once __DIR__ . '/../core/csrf.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (!isset($_GET['id'])) {
-    header('Location: impressoras');
+    header('Location: /controle-toner/impressoras');
     exit;
 }
 
@@ -24,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare('UPDATE impressoras SET codigo = ?, modelo = ?, localizacao = ? WHERE id = ?');
                 $stmt->execute([$codigo, $modelo, $localizacao, $id]);
                 $_SESSION['message'] = ['type' => 'success', 'text' => "Impressora atualizada com sucesso!"];
-                header('Location: impressoras');
+                header('Location: /controle-toner/impressoras');
                 exit;
             } catch (PDOException $e) {
                 if ($e->errorInfo[1] == 1062) { // Duplicate entry

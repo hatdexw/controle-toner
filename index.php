@@ -17,16 +17,44 @@ if (session_status() === PHP_SESSION_NONE) {
 // Cria uma instância do roteador
 $router = new Router($pdo);
 
-// Adiciona as rotas
-// A rota '/' agora aponta para o antigo 'index.php', que moveremos para 'home.php'
-$router->add('/controle-toner/', 'home.php');
-$router->add('/controle-toner/estoque', 'estoque.php');
-$router->add('/controle-toner/impressoras', 'impressoras.php');
-$router->add('/controle-toner/historico', 'historico.php');
-$router->add('/controle-toner/trocar', 'trocar.php');
-$router->add('/controle-toner/editar_impressora', 'editar_impressora.php');
-$router->add('/controle-toner/gerenciar_compatibilidade', 'gerenciar_compatibilidade.php');
-$router->add('/controle-toner/export_pdf', 'export_pdf.php');
+// Rotas páginas (GET)
+$router->add('GET','/controle-toner/','home.php');
+$router->add('GET','/controle-toner/estoque','estoque.php');
+$router->add('POST','/controle-toner/estoque','estoque.php');
+$router->add('GET','/controle-toner/impressoras','impressoras.php');
+$router->add('POST','/controle-toner/impressoras','impressoras.php');
+$router->add('GET','/controle-toner/historico','historico.php');
+$router->add('GET','/controle-toner/trocar','trocar.php');
+$router->add('POST','/controle-toner/trocar','trocar.php');
+$router->add('GET','/controle-toner/editar_impressora','editar_impressora.php');
+$router->add('POST','/controle-toner/editar_impressora','editar_impressora.php');
+$router->add('GET','/controle-toner/gerenciar_compatibilidade','gerenciar_compatibilidade.php');
+$router->add('POST','/controle-toner/gerenciar_compatibilidade','gerenciar_compatibilidade.php');
+$router->add('GET','/controle-toner/export_pdf','export_pdf.php');
+
+// API simples (JSON)
+$router->add('GET','/controle-toner/api/printers', function() use ($pdo){
+    header('Content-Type: application/json');
+    $data = $pdo->query('SELECT id,codigo,modelo,localizacao,toner_status FROM impressoras ORDER BY codigo')->fetchAll(\PDO::FETCH_ASSOC);
+    return json_encode(['data'=>$data]);
+});
+$router->add('GET','/controle-toner/status', function() use ($pdo){
+    header('Content-Type: application/json');
+    $ok = true; $db= 'ok';
+    try { $pdo->query('SELECT 1'); } catch(\Throwable $e){ $ok=false; $db='fail'; }
+    return json_encode(['status'=>$ok?'ok':'degraded','db'=>$db,'time'=>date('c')]);
+});
+$router->add('GET','/controle-toner/dashboard','dashboard.php');
+
+// Rota detalhada (exemplo param):
+$router->add('GET','/controle-toner/api/printers/{id}', function($params) use ($pdo){
+    header('Content-Type: application/json');
+    $st = $pdo->prepare('SELECT * FROM impressoras WHERE id=?');
+    $st->execute([$params['id']]);
+    $row = $st->fetch(\PDO::FETCH_ASSOC);
+    if(!$row){ http_response_code(404); return json_encode(['error'=>'Not found']); }
+    return json_encode($row);
+});
 
 // Obtém a URI da requisição
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -45,4 +73,8 @@ if ($uri !== '/controle-toner/') {
 }
 
 // Despacha a rota
-$router->dispatch($uri);
+$router->dispatch($_SERVER['REQUEST_METHOD'],$uri);
+
+// Logging simples
+$logDir = __DIR__.'/logs'; if(!is_dir($logDir)) @mkdir($logDir,0777,true);
+@file_put_contents($logDir.'/access.log',sprintf("[%s] %s %s %s\n",date('c'),$_SERVER['REMOTE_ADDR']??'-',$_SERVER['REQUEST_METHOD'],$uri),FILE_APPEND);

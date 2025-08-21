@@ -3,12 +3,32 @@
 require_once __DIR__ . '/../actions/impressora_actions.php';
 require_once __DIR__ . '/../../layout/header.php';
 
+
 $page = max(1,(int)($_GET['p']??1));
 $perPage = 20;
 $offset = ($page-1)*$perPage;
+$order = $_GET['order'] ?? 'codigo';
+$allowedOrders = ['codigo', 'modelo', 'toner_status', 'ultima_troca'];
+if (!in_array($order, $allowedOrders)) $order = 'codigo';
+
+// Monta o campo de ordenação SQL
+switch ($order) {
+  case 'modelo':
+    $orderBy = 'modelo';
+    break;
+  case 'toner_status':
+    $orderBy = 'toner_status DESC';
+    break;
+  case 'ultima_troca':
+    $orderBy = '(SELECT MAX(data_troca) FROM historico_trocas WHERE historico_trocas.codigo = impressoras.codigo) DESC';
+    break;
+  default:
+    $orderBy = 'codigo';
+}
+
 $totalPrinters = (int)$pdo->query('SELECT COUNT(*) FROM impressoras')->fetchColumn();
 $totalPages = max(1,(int)ceil($totalPrinters/$perPage));
-$stmt = $pdo->prepare('SELECT * FROM impressoras ORDER BY codigo LIMIT :limit OFFSET :offset');
+$stmt = $pdo->prepare("SELECT * FROM impressoras ORDER BY $orderBy LIMIT :limit OFFSET :offset");
 $stmt->bindValue(':limit',$perPage,PDO::PARAM_INT);
 $stmt->bindValue(':offset',$offset,PDO::PARAM_INT);
 $stmt->execute();
@@ -27,7 +47,16 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
   </form>
 </div>
 <div class="glass-card p-8 fade-in anim-hover-lift">
-  <div class="card-header mb-2"><h2 class="card-title">Impressoras Cadastradas</h2><span class="badge">Lista</span></div>
+  <div class="card-header mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <h2 class="card-title">Impressoras Cadastradas</h2><span class="badge">Lista</span>
+    </div>
+    <div class="flex gap-2 mt-2 md:mt-0">
+      <button class="neutral-btn !px-4 !py-1 text-sm" onclick="window.location.search='?order=codigo'<?= $page>1?'+&p='.$page:'' ?>">Ordenar Código</button>
+      <button class="neutral-btn !px-4 !py-1 text-sm" onclick="window.location.search='?order=toner_status'<?= $page>1?'+&p='.$page:'' ?>">Ordenar Toner</button>
+      <button class="neutral-btn !px-4 !py-1 text-sm" onclick="window.location.search='?order=ultima_troca'<?= $page>1?'+&p='.$page:'' ?>">Ordenar Última Troca</button>
+    </div>
+  </div>
   <div class="mb-4"><input type="text" id="searchImpressora" placeholder="Buscar impressora por código, modelo ou localização..." class="form-input"></div>
   <div class="overflow-x-auto">
   <table class="table-base responsive-stack" id="impressorasTable">
@@ -58,9 +87,9 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
   <div class="flex items-center justify-between mt-6">
     <span class="text-xs text-gray-500 dark:text-gray-400">Total: <?= $totalPrinters ?> impressoras</span>
     <div class="flex gap-2 items-center">
-      <?php if($page>1): ?><a href="?p=<?= $page-1 ?>" class="neutral-btn !px-3 !py-1 text-xs">Anterior</a><?php endif; ?>
+      <?php if($page>1): ?><a href="?p=<?= $page-1 ?>&order=<?= htmlspecialchars($order) ?>" class="neutral-btn !px-3 !py-1 text-xs">Anterior</a><?php endif; ?>
       <span class="text-xs text-gray-500 dark:text-gray-400">Página <?= $page ?> / <?= $totalPages ?></span>
-      <?php if($page<$totalPages): ?><a href="?p=<?= $page+1 ?>" class="neutral-btn !px-3 !py-1 text-xs">Próxima</a><?php endif; ?>
+      <?php if($page<$totalPages): ?><a href="?p=<?= $page+1 ?>&order=<?= htmlspecialchars($order) ?>" class="neutral-btn !px-3 !py-1 text-xs">Próxima</a><?php endif; ?>
     </div>
   </div>
 </div>

@@ -45,6 +45,7 @@ $router->add('GET','/controle-toner/status', function() use ($pdo){
     return json_encode(['status'=>$ok?'ok':'degraded','db'=>$db,'time'=>date('c')]);
 });
 $router->add('GET','/controle-toner/dashboard','dashboard.php');
+$router->add('GET','/controle-toner/offline','offline.php');
 
 // Rota detalhada (exemplo param):
 $router->add('GET','/controle-toner/api/printers/{id}', function($params) use ($pdo){

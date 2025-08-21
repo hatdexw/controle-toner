@@ -3,7 +3,15 @@
 require_once __DIR__ . '/../actions/impressora_actions.php';
 require_once __DIR__ . '/../../layout/header.php';
 
-$stmt = $pdo->query('SELECT * FROM impressoras ORDER BY codigo');
+$page = max(1,(int)($_GET['p']??1));
+$perPage = 20;
+$offset = ($page-1)*$perPage;
+$totalPrinters = (int)$pdo->query('SELECT COUNT(*) FROM impressoras')->fetchColumn();
+$totalPages = max(1,(int)ceil($totalPrinters/$perPage));
+$stmt = $pdo->prepare('SELECT * FROM impressoras ORDER BY codigo LIMIT :limit OFFSET :offset');
+$stmt->bindValue(':limit',$perPage,PDO::PARAM_INT);
+$stmt->bindValue(':offset',$offset,PDO::PARAM_INT);
+$stmt->execute();
 $impressoras = $stmt->fetchAll();
 if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type']; $message_text = $_SESSION['message']['text']; echo "<script>showToast('$message_type', '$message_text');</script>"; unset($_SESSION['message']); }
 ?>
@@ -22,7 +30,7 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
   <div class="card-header mb-2"><h2 class="card-title">Impressoras Cadastradas</h2><span class="badge">Lista</span></div>
   <div class="mb-4"><input type="text" id="searchImpressora" placeholder="Buscar impressora por código, modelo ou localização..." class="form-input"></div>
   <div class="overflow-x-auto">
-    <table class="table-base" id="impressorasTable">
+  <table class="table-base responsive-stack" id="impressorasTable">
       <thead class="table-head-row">
         <tr>
           <th scope="col" class="table-head-cell">Código</th>
@@ -46,6 +54,14 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
         <?php endforeach; ?>
       </tbody>
     </table>
+  </div>
+  <div class="flex items-center justify-between mt-6">
+    <span class="text-xs text-gray-500 dark:text-gray-400">Total: <?= $totalPrinters ?> impressoras</span>
+    <div class="flex gap-2 items-center">
+      <?php if($page>1): ?><a href="?p=<?= $page-1 ?>" class="neutral-btn !px-3 !py-1 text-xs">Anterior</a><?php endif; ?>
+      <span class="text-xs text-gray-500 dark:text-gray-400">Página <?= $page ?> / <?= $totalPages ?></span>
+      <?php if($page<$totalPages): ?><a href="?p=<?= $page+1 ?>" class="neutral-btn !px-3 !py-1 text-xs">Próxima</a><?php endif; ?>
+    </div>
   </div>
 </div>
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>

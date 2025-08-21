@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
     <meta name="color-scheme" content="light dark">
+        <link rel="manifest" href="/controle-toner/manifest.webmanifest">
+        <meta name="theme-color" content="#1f5fff" />
+        <link rel="apple-touch-icon" href="/controle-toner/icons/icon-192.png">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       (function(){
@@ -18,17 +21,20 @@
         } catch(e){}
       })();
     </script>
+        <script>
+            if('serviceWorker' in navigator){
+                window.addEventListener('load',()=>{
+                    navigator.serviceWorker.register('/controle-toner/sw.js').catch(()=>{});
+                });
+            }
+        </script>
 </head>
 <body class="min-h-screen flex flex-col pt-24 selection:bg-brand-500/90">
     <nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-gray-900/80 dark:bg-gray-950/70 border-b border-white/10">
         <div class="app-container h-20 flex items-center justify-between">
             <div class="flex items-center gap-6">
                 <a href="/controle-toner/" class="group inline-flex items-center gap-2">
-                    <span class="relative inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-brand-sm ring-1 ring-white/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
-                        </svg>
-                    </span>
+                    
                     <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-300 via-white to-brand-200">Controle de Toners</span>
                 </a>
             </div>
@@ -56,6 +62,7 @@
                     <span class="theme-icon-sun block dark:hidden">🌞</span>
                     <span class="theme-icon-moon hidden dark:block">🌙</span>
                 </button>
+                <button id="pwaInstallBtn" class="nav-link !px-3 hidden" aria-label="Instalar Aplicativo">Instalar</button>
             </div>
         </div>
         <div id="mobilePanel" class="lg:hidden hidden px-4 pb-6 origin-top animate-scale-in">

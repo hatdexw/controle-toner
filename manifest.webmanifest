@@ -1,0 +1,14 @@
+{
+  "name": "Controle de Toners",
+  "short_name": "Toners",
+  "start_url": "/controle-toner/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1f5fff",
+  "description": "Gestão de impressoras e suprimentos de toner.",
+  "lang": "pt-BR",
+  "icons": [
+    {"src": "/controle-toner/icons/icon-192.png","sizes": "192x192","type": "image/png"},
+    {"src": "/controle-toner/icons/icon-512.png","sizes": "512x512","type": "image/png"}
+  ]
+}

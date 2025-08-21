@@ -9,17 +9,26 @@ if (isset($_SESSION['message'])) {
     unset($_SESSION['message']);
 }
 
-$stmt = $pdo->query(
-    'SELECT i.id, i.codigo, i.modelo, i.localizacao, i.toner_status, 
-            i.ink_black, i.ink_cyan, i.ink_magenta, i.ink_yellow, i.ink_photo_black, i.ink_gray, 
-            h.data_troca, s.modelo as suprimento_modelo, s.tipo 
-     FROM impressoras i 
-     LEFT JOIN (SELECT impressora_id, MAX(data_troca) as max_data FROM historico_trocas GROUP BY impressora_id) as ht 
-     ON i.id = ht.impressora_id
-     LEFT JOIN historico_trocas h ON h.impressora_id = i.id AND h.data_troca = ht.max_data
-     LEFT JOIN suprimentos s ON s.id = h.suprimento_id
-     ORDER BY i.codigo'
+$page = max(1, (int)($_GET['p'] ?? 1));
+$perPage = 12;
+$offset = ($page - 1) * $perPage;
+$totalPrinters = (int)$pdo->query('SELECT COUNT(*) FROM impressoras')->fetchColumn();
+$totalPages = max(1, (int)ceil($totalPrinters / $perPage));
+$stmt = $pdo->prepare(
+        'SELECT i.id, i.codigo, i.modelo, i.localizacao, i.toner_status,
+                        i.ink_black, i.ink_cyan, i.ink_magenta, i.ink_yellow, i.ink_photo_black, i.ink_gray,
+                        h.data_troca, s.modelo as suprimento_modelo, s.tipo
+         FROM impressoras i
+         LEFT JOIN (SELECT impressora_id, MAX(data_troca) as max_data FROM historico_trocas GROUP BY impressora_id) as ht
+             ON i.id = ht.impressora_id
+         LEFT JOIN historico_trocas h ON h.impressora_id = i.id AND h.data_troca = ht.max_data
+         LEFT JOIN suprimentos s ON s.id = h.suprimento_id
+         ORDER BY i.codigo
+         LIMIT :limit OFFSET :offset'
 );
+$stmt->bindValue(':limit',$perPage, PDO::PARAM_INT);
+$stmt->bindValue(':offset',$offset, PDO::PARAM_INT);
+$stmt->execute();
 ?>
 <h1 class="section-title">Impressoras</h1>
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 fade-in">
@@ -33,7 +42,7 @@ $stmt = $pdo->query(
         <input type="text" id="printerFilter" placeholder="Filtrar por código/modelo/localização" class="form-input w-72" />
     </div>
 </div>
-<div id="printersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr stagger">
+<div id="printersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr stagger" data-total-pages="<?= $totalPages ?>" data-current-page="<?= $page ?>">
 <?php while ($impressora = $stmt->fetch()) { ?>
 <?php
     $toner_status = $impressora['toner_status'];
@@ -121,6 +130,15 @@ $stmt = $pdo->query(
     </div>
 <?php } ?>
 </div>
+<div class="flex items-center justify-center mt-10 gap-2" id="paginationControls">
+    <?php if ($page > 1): ?>
+        <a href="?p=<?= $page-1 ?>" class="neutral-btn !px-3 !py-2 text-xs" aria-label="Página anterior">Anterior</a>
+    <?php endif; ?>
+    <span class="text-xs text-gray-500 dark:text-gray-400">Página <?= $page ?> de <?= $totalPages ?></span>
+    <?php if ($page < $totalPages): ?>
+        <a href="?p=<?= $page+1 ?>" class="neutral-btn !px-3 !py-2 text-xs" aria-label="Próxima página">Próxima</a>
+    <?php endif; ?>
+</div>
 <script>
 // Sorting & filtering (client side)
 document.addEventListener('DOMContentLoaded',()=>{
@@ -140,6 +158,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     let currentSort='codigo';
     document.querySelectorAll('.sort-btn').forEach(btn=>btn.addEventListener('click',()=>{currentSort=btn.dataset.sort;applyFilterAndSort(currentSort);}));
     document.getElementById('printerFilter').addEventListener('input',()=>applyFilterAndSort(currentSort));
+    // Lazy load (placeholder): could be upgraded to fetch next pages via AJAX
 });
 </script>
 <?php require __DIR__ . '/../../layout/footer.php'; ?>

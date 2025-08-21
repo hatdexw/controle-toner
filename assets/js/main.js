@@ -17,6 +17,12 @@ function showToast(icon, title) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // PWA install prompt (deferred)
+    let deferredPrompt; const installBtnId='pwaInstallBtn';
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const btn=document.getElementById(installBtnId); if(btn){ btn.classList.remove('hidden'); }});
+    const maybeInstallBtn=document.getElementById(installBtnId);
+    if(maybeInstallBtn){ maybeInstallBtn.addEventListener('click', async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const choice= await deferredPrompt.userChoice; if(choice.outcome==='accepted'){ showToast('success','App instalada'); } deferredPrompt=null; maybeInstallBtn.classList.add('hidden'); }); }
+
     // Display messages from PHP
     if (window.appMessage) {
         showToast(window.appMessage.type, window.appMessage.text);
@@ -132,4 +138,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Responsive table stacking for narrow screens
+    function enhanceResponsiveTables(){
+        if(window.innerWidth>768) return; // only mobile
+        document.querySelectorAll('table.responsive-stack').forEach(tbl=>{
+            if(tbl.dataset.enhanced) return; tbl.dataset.enhanced='1';
+            const headers=[...tbl.querySelectorAll('thead th')].map(th=>th.textContent.trim());
+            tbl.querySelectorAll('tbody tr').forEach(row=>{
+                [...row.children].forEach((cell,i)=>{
+                    if(headers[i]){
+                        const span=document.createElement('span');
+                        span.className='block text-xs font-semibold uppercase text-brand-500 dark:text-brand-400 mb-0.5';
+                        span.textContent=headers[i];
+                        const wrapper=document.createElement('div');
+                        wrapper.className='sm:hidden';
+                        while(cell.firstChild) wrapper.appendChild(cell.firstChild);
+                        cell.appendChild(span); cell.appendChild(wrapper);
+                        cell.classList.add('align-top','!py-3');
+                    }
+                });
+            });
+        });
+    }
+    enhanceResponsiveTables();
+    window.addEventListener('resize',()=>enhanceResponsiveTables());
 });

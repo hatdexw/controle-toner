@@ -36,6 +36,16 @@ body { -ms-overflow-style: none; }
   .table-head-cell { @apply px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300; }
   .table-row { @apply hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors duration-150; }
   .table-cell { @apply px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300; }
+  /* Responsivo: empilhar linhas da tabela em telas pequenas */
+  @media (max-width: 640px){
+    .responsive-stack thead { display:none; }
+    .responsive-stack tbody { display:block; }
+    .responsive-stack tr { @apply block bg-white/80 dark:bg-white/10 rounded-xl mb-4 border border-gray-200/60 dark:border-white/10 p-4; }
+    .responsive-stack td { @apply flex items-baseline justify-between px-2 py-1 text-sm whitespace-normal; display:flex; }
+    .responsive-stack td::before { content: attr(data-label); @apply uppercase tracking-wide text-[10px] font-semibold text-gray-500 dark:text-gray-400 mr-3 flex-shrink-0; }
+    .responsive-stack td:last-child { @apply pt-3 flex-wrap gap-2; }
+    .responsive-stack td:last-child::before { @apply basis-full mb-1; }
+  }
   .nav-link { @apply relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition; }
   .nav-link-active { @apply nav-link text-white bg-white/10 shadow-brand-sm; }
   .fade-in { @apply animate-fade-in; }

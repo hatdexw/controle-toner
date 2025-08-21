@@ -114,7 +114,7 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
         <h2 class="card-title">Registros de Trocas</h2>
     </div>
     <div class="overflow-x-auto rounded-xl ring-1 ring-black/5 dark:ring-white/10">
-        <table class="table-base">
+    <table class="table-base responsive-stack">
             <thead class="table-head-row">
                 <tr>
                     <th class="table-head-cell">Data</th>
@@ -133,12 +133,24 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
                 <?php else : ?>
                     <?php foreach ($historico as $troca) : ?>
                         <tr class="table-row">
-                            <td class="table-cell font-medium text-gray-900 dark:text-gray-100"><?= date('d/m/Y H:i', strtotime($troca['data_troca'])) ?></td>
-                            <td class="table-cell"><?= htmlspecialchars($troca['codigo']) ?></td>
-                            <td class="table-cell"><?= htmlspecialchars($troca['impressora_modelo']) ?></td>
-                            <td class="table-cell"><?= htmlspecialchars($troca['localizacao']) ?></td>
-                            <td class="table-cell"><?= htmlspecialchars($troca['suprimento_modelo']) ?></td>
-                            <td class="table-cell"><?= htmlspecialchars($troca['tipo']) ?></td>
+                            <td class="table-cell font-medium text-gray-900 dark:text-gray-100" data-label="Data">
+                                <?= date('d/m/Y H:i', strtotime($troca['data_troca'])) ?>
+                            </td>
+                            <td class="table-cell" data-label="Código">
+                                <?= htmlspecialchars($troca['codigo']) ?>
+                            </td>
+                            <td class="table-cell" data-label="Modelo">
+                                <?= htmlspecialchars($troca['impressora_modelo']) ?>
+                            </td>
+                            <td class="table-cell" data-label="Localização">
+                                <?= htmlspecialchars($troca['localizacao']) ?>
+                            </td>
+                            <td class="table-cell" data-label="Suprimento">
+                                <?= htmlspecialchars($troca['suprimento_modelo']) ?>
+                            </td>
+                            <td class="table-cell" data-label="Tipo">
+                                <?= htmlspecialchars($troca['tipo']) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

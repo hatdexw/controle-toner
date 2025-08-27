@@ -68,7 +68,8 @@ $criticalSup = $data['criticalSupplies'];
   </div>
   <div class="col-span-12 xl:col-span-9 soft-card p-4">
     <div class="card-header mb-1"><h3 class="card-title text-base">Gastos por Categoria (Distribuição de Toner)</h3></div>
-    <div class="h-[180px]"><canvas id="chartTonerDist" class="w-full h-full" role="img" aria-label="Distribuição"></canvas></div>
+  <div class="h-[180px]"><canvas id="chartTonerDist" class="w-full h-full" role="img" aria-label="Distribuição"></canvas></div>
+  <div id="legend-toner" class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs text-gray-600 dark:text-gray-300"></div>
   </div>
 </div>
 
@@ -86,31 +87,18 @@ $criticalSup = $data['criticalSupplies'];
       <?php endforeach; endif; ?>
     </ul>
   </div>
-  <div class="col-span-12 md:col-span-6 xl:col-span-3 glass-card p-3">
-    <div class="card-header mb-1"><h3 class="card-title text-base">Mais Críticas</h3><span class="badge">Toner baixo</span></div>
-    <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
-      <?php if(empty($lowPrinters)): ?>
-        <li class="text-gray-500 dark:text-gray-400">Sem impressoras críticas.</li>
-      <?php else: foreach($lowPrinters as $lp): ?>
-        <li class="flex items-center justify-between">
-          <span class="truncate font-medium"><?= htmlspecialchars($lp['codigo']) ?> — <?= htmlspecialchars($lp['modelo']) ?></span>
-          <span class="ml-3 text-xs px-2 py-0.5 rounded-full <?= ((int)$lp['toner_status']<=5?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300') ?>"><?= (int)$lp['toner_status'] ?>%</span>
-        </li>
-      <?php endforeach; endif; ?>
-    </ul>
-  </div>
+  
   <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
     <div class="card-header mb-1"><h3 class="card-title text-base">Estoque por Tipo</h3><span class="badge">Suprimentos</span></div>
-    <div class="h-[120px]"><canvas id="chartSupplies" class="w-full h-full" aria-label="Gráfico de estoque por tipo" role="img"></canvas></div>
+  <div class="h-[120px]"><canvas id="chartSupplies" class="w-full h-full" aria-label="Gráfico de estoque por tipo" role="img"></canvas></div>
+  <div id="legend-sup" class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs text-gray-600 dark:text-gray-300"></div>
   </div>
   <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
     <div class="card-header mb-1"><h3 class="card-title text-base">Status das Impressoras</h3><span class="badge">Health</span></div>
-    <div class="h-[120px]"><canvas id="chartPrinterStatus" class="w-full h-full" aria-label="Gráfico de status das impressoras" role="img"></canvas></div>
+  <div class="h-[120px]"><canvas id="chartPrinterStatus" class="w-full h-full" aria-label="Gráfico de status das impressoras" role="img"></canvas></div>
+  <div id="legend-status" class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs text-gray-600 dark:text-gray-300"></div>
   </div>
-  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
-    <div class="card-header mb-1"><h3 class="card-title text-base">Trocas (7 dias)</h3><span class="badge">Tendência</span></div>
-    <div class="h-[140px]"><canvas id="chartExchanges" class="w-full h-full" aria-label="Gráfico de trocas nos últimos 7 dias" role="img"></canvas></div>
-  </div>
+  
   <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
     <div class="card-header mb-1"><h3 class="card-title text-base">Suprimentos Críticos</h3><span class="badge">Estoque</span></div>
     <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
@@ -142,6 +130,7 @@ function initCharts(){
     <?= (int)$statusSummary['baixo'] ?>,
     <?= (int)$statusSummary['ok'] ?>
   ];
+  // Exchanges series kept for future use (no chart rendered now)
   const exchangesLabels = <?= json_encode(array_map(fn($d)=>date('d/m',strtotime($d)),$dates)) ?>;
   const exchangesData = <?= json_encode($counts, JSON_NUMERIC_CHECK) ?>;
   const dark = document.documentElement.classList.contains('dark');
@@ -153,21 +142,37 @@ function initCharts(){
     responsive:true,
     maintainAspectRatio:false
   };
+  // Distribuição de Toner (índice automático por fatia)
+  const tonerLabels = ['Vazio','Baixo (1-15%)','Médio (16-50%)','Alto (51%+)'];
+  const tonerColors = ['#ef4444','#f59e0b','#3b82f6','#10b981'];
   new Chart(document.getElementById('chartTonerDist'),{type:'doughnut',data:{
-      labels:['Vazio','Baixo (1-15%)','Médio (16-50%)','Alto (51%+)'],
-      datasets:[{data:tonerData,backgroundColor:['#ef4444','#f59e0b','#3b82f6','#10b981'],borderWidth:0}]
+      labels:tonerLabels,
+      datasets:[{data:tonerData,backgroundColor:tonerColors,borderWidth:0}]
     },options:{plugins:{legend:{display:false}},cutout:'55%',responsive:true,maintainAspectRatio:false}});
-  new Chart(document.getElementById('chartSupplies'),{type:'bar',data:{labels:suppliesLabels,datasets:[{label:'Qtd',data:suppliesData,backgroundColor:'#1f5fff'}]},options:commonSmall});
+  // Estoque por Tipo (índice personalizado por categoria)
+  const palette = ['#1f5fff','#10b981','#f59e0b','#ef4444','#6366f1','#14b8a6','#eab308','#f97316','#22c55e','#a855f7'];
+  const catColors = suppliesLabels.map((_,i)=> palette[i % palette.length]);
+  new Chart(document.getElementById('chartSupplies'),{type:'bar',data:{labels:suppliesLabels,datasets:[{label:'Qtd',data:suppliesData,backgroundColor:catColors}]},options:commonSmall});
+  // Status das Impressoras (índice personalizado por status, sem 'Sem Dado')
+  const statusLabels = ['Vazio','Baixo','OK'];
+  const statusColors = ['#ef4444','#f59e0b','#10b981'];
+  const statusDataClean = statusData.slice(1);
   new Chart(document.getElementById('chartPrinterStatus'),{type:'bar',data:{
-      labels:['Sem Dado','Vazio','Baixo','OK'],
-      datasets:[{label:'Impressoras',data:statusData,backgroundColor:['#6b7280','#ef4444','#f59e0b','#10b981']}]
+      labels:statusLabels,
+      datasets:[{label:'Impressoras',data:statusDataClean,backgroundColor:statusColors}]
     },options:commonSmall});
-  const exchangeOpts = {
-    plugins:{ legend:{ display:false } },
-    scales:{ x:{ display:true, ticks:{ color:textCol, maxTicksLimit:10 }, grid:{ color:baseGrid } }, y:{ display:true, ticks:{ color:textCol, precision:0 }, grid:{ color:baseGrid } } },
-    responsive:true, maintainAspectRatio:false
-  };
-  new Chart(document.getElementById('chartExchanges'),{type:'line',data:{labels:exchangesLabels,datasets:[{label:'Trocas',data:exchangesData,fill:true,borderColor:'#1f5fff',backgroundColor:'rgba(31,95,255,0.15)',tension:.35}]},options:exchangeOpts});
+
+  // Render custom HTML legends under charts
+  function renderLegend(containerId, labels, colors){
+    const el = document.getElementById(containerId);
+    if(!el) return;
+    el.innerHTML = `<div class="w-full flex flex-wrap justify-center items-center gap-x-4 gap-y-2">` +
+      labels.map((l,i)=>`<span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-sm" style="background:${colors[i]}"></span>${l}</span>`).join(' ') + '</div>';
+  }
+  renderLegend('legend-toner', tonerLabels, tonerColors);
+  renderLegend('legend-sup', suppliesLabels, catColors);
+  renderLegend('legend-status', statusLabels, statusColors);
+  // No exchange chart rendered (card removido)
 }
 </script>
 <?php require_once __DIR__.'/../../layout/footer.php'; ?>

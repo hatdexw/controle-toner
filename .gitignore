@@ -13,4 +13,5 @@ db.php
 # Arquivo com dados do banco de dados (se contiver dados reais e não apenas a estrutura)
 database.sql
 
-*.log
+#arquivos de log
+access.log

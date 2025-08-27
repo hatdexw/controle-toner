@@ -18,11 +18,11 @@ if (session_status() === PHP_SESSION_NONE) {
 $router = new Router($pdo);
 
 // Rotas páginas (GET)
-$router->add('GET','/controle-toner/','home.php');
+$router->add('GET','/controle-toner/','lista_impressoras.php');
 $router->add('GET','/controle-toner/estoque','estoque.php');
 $router->add('POST','/controle-toner/estoque','estoque.php');
-$router->add('GET','/controle-toner/impressoras','impressoras.php');
-$router->add('POST','/controle-toner/impressoras','impressoras.php');
+$router->add('GET','/controle-toner/impressoras','gerenciar_impressoras.php');
+$router->add('POST','/controle-toner/impressoras','gerenciar_impressoras.php');
 $router->add('GET','/controle-toner/historico','historico.php');
 $router->add('GET','/controle-toner/trocar','trocar.php');
 $router->add('POST','/controle-toner/trocar','trocar.php');

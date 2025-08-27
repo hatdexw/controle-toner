@@ -24,11 +24,11 @@ body { -ms-overflow-style: none; }
   .card-header { @apply flex items-start justify-between mb-4; }
   .card-title { @apply text-xl font-semibold tracking-tight text-gray-800 dark:text-gray-100; }
   .card-subtitle { @apply text-sm text-gray-500 dark:text-gray-400 font-medium; }
-  .primary-btn { @apply inline-flex items-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-medium px-5 py-2.5 shadow-brand-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 dark:focus:ring-offset-gray-900; }
+  .primary-btn { @apply inline-flex items-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-medium px-5 py-2.5 shadow-brand-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 dark:focus:ring-offset-gray-900; }
   .danger-btn { @apply inline-flex items-center gap-2 rounded-lg bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-medium px-5 py-2.5 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-900; }
   .neutral-btn { @apply inline-flex items-center gap-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 font-medium px-4 py-2 shadow-sm transition; }
   .badge { @apply inline-flex items-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300 px-3 py-1 text-xs font-medium; }
-  .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-200 text-center mb-10; }
+  .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-700 to-brand-500 dark:from-brand-400 dark:to-brand-300 text-center mb-10; }
   /* KPI small card used in dashboard */
   .kpi-card { @apply flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm; }
   .kpi-icon { @apply inline-flex items-center justify-center h-10 w-10 rounded-md text-white; }
@@ -39,7 +39,7 @@ body { -ms-overflow-style: none; }
   .field-label { @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 tracking-wide; }
   .form-input, .form-select, .form-textarea { @apply w-full rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/60 shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500; }
   .toner-bar-wrapper { @apply relative w-full h-4 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-inner; }
-  .toner-bar { @apply absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 dark:from-brand-400 dark:to-brand-300 transition-all duration-700 ease-snappy; }
+  .toner-bar { @apply absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-300 transition-all duration-700 ease-snappy; }
   .toner-empty { @apply bg-gradient-to-r from-red-500 to-red-600 animate-pulse; }
   .ink-column { @apply relative w-7 md:w-8 bg-gray-200 dark:bg-gray-800 h-full rounded-xl overflow-hidden flex flex-col justify-end ring-1 ring-inset ring-black/5 dark:ring-white/10; }
   .ink-fill { @apply w-full flex items-center justify-center text-[10px] font-semibold text-white rounded-t-lg transition-all duration-700 ease-snappy; }
@@ -69,8 +69,8 @@ body { -ms-overflow-style: none; }
   .stagger>*:nth-child(6){animation-delay:.3s}
 }
 @layer utilities {
-  .gradient-border { background: linear-gradient(#fff,#fff) padding-box,linear-gradient(110deg,#1f5fff,#84b3ff,#ffb347) border-box; border:2px solid transparent; }
-  .dark .gradient-border { background:linear-gradient(#0f172a,#0f172a) padding-box,linear-gradient(110deg,#4f8bff,#1f5fff,#ffb347) border-box }
+  .gradient-border { background: linear-gradient(#fff,#fff) padding-box,linear-gradient(110deg,#2563eb,#60a5fa,#d97706) border-box; border:2px solid transparent; }
+  .dark .gradient-border { background:linear-gradient(#0f172a,#0f172a) padding-box,linear-gradient(110deg,#60a5fa,#2563eb,#d97706) border-box }
   .anim-hover-lift { transition: transform .35s var(--tw-ease-out),box-shadow .35s var(--tw-ease-out);} 
   .anim-hover-lift:hover { transform: translateY(-4px); }
 }

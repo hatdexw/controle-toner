@@ -107,6 +107,10 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h5v-2H4V4h12v5h2V4a2 2 0 00-2-2H4zm9 9V7h2l-3-4-3 4h2v4h2zm-5 2v2h2v-2H8z" clip-rule="evenodd" /></svg>
         <span>Exportar PDF</span>
     </a>
+    <button id="exportCsv" type="button" class="neutral-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h14a1 1 0 011 1v4H2V4a1 1 0 011-1z"/><path d="M2 10h16v6a1 1 0 01-1 1H3a1 1 0 01-1-1v-6z"/></svg>
+        <span>Exportar CSV</span>
+    </button>
 </div>
 
 <div class="glass-card p-8 overflow-hidden">
@@ -158,5 +162,18 @@ $pdf_export_link = '/controle-toner/export_pdf' . (!empty($pdf_query_string) ? '
         </table>
     </div>
 </div>
+<script>
+document.getElementById('exportCsv')?.addEventListener('click',()=>{
+    const rows=[["Data","Codigo","Modelo","Localizacao","Suprimento","Tipo"]];
+    <?php if (!empty($historico)) : ?>
+    <?php foreach ($historico as $troca): ?>
+    rows.push(["<?= date('Y-m-d H:i', strtotime($troca['data_troca'])) ?>","<?= addslashes($troca['codigo']) ?>","<?= addslashes($troca['impressora_modelo']) ?>","<?= addslashes($troca['localizacao']) ?>","<?= addslashes($troca['suprimento_modelo']) ?>","<?= addslashes($troca['tipo']) ?>"]);
+    <?php endforeach; ?>
+    <?php endif; ?>
+    const csv = rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='historico.csv'; a.click(); URL.revokeObjectURL(a.href);
+});
+</script>
 
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>

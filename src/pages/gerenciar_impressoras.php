@@ -65,6 +65,7 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
           <th scope="col" class="table-head-cell">Código</th>
           <th scope="col" class="table-head-cell">Modelo</th>
           <th scope="col" class="table-head-cell">Localização</th>
+          <th scope="col" class="table-head-cell">Toner</th>
           <th scope="col" class="table-head-cell text-center">Ações</th>
         </tr>
       </thead>
@@ -79,6 +80,14 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
           </td>
           <td class="table-cell" data-label="Localização">
             <?= htmlspecialchars($impressora['localizacao']) ?>
+          </td>
+          <td class="table-cell" data-label="Toner">
+            <?php $lvl = isset($impressora['toner_status']) ? (int)$impressora['toner_status'] : null; ?>
+            <?php if ($lvl === null): ?>
+              <span class="text-xs text-gray-400">—</span>
+            <?php else: ?>
+              <span class="text-xs px-2 py-0.5 rounded-full <?= ($lvl==0?'bg-red-500/20 text-red-600 dark:text-red-300':($lvl<=15?'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300':'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300')) ?>"><?= $lvl ?>%</span>
+            <?php endif; ?>
           </td>
           <td class="table-cell text-center flex flex-wrap gap-2 justify-center" data-label="Ações">
             <a href="/controle-toner/editar_impressora?id=<?= $impressora['id'] ?>" class="primary-btn !px-3 !py-2 text-xs"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z"/></svg>Editar</a>

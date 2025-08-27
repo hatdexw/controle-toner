@@ -6,7 +6,7 @@
                 <span class="inline-flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
                 </span>
-                <span>v2.1 UI Refresh</span>
+                <span>v3.0 UI</span>
             </div>
         </div>
     </footer>

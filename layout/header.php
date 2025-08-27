@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
     <meta name="color-scheme" content="light dark">
         <link rel="manifest" href="/controle-toner/manifest.webmanifest">
-        <meta name="theme-color" content="#1f5fff" />
+    <meta name="theme-color" content="#2563eb" />
         <link rel="apple-touch-icon" href="/controle-toner/icons/icon-192.png">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

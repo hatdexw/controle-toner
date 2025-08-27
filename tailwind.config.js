@@ -12,8 +12,9 @@ module.exports = {
     extend: {
       fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
       colors: {
-        brand: { 50:'#eef4ff',100:'#d9e7ff',200:'#b3d0ff',300:'#84b3ff',400:'#4f8bff',500:'#1f5fff',600:'#1548db',700:'#1239aa',800:'#132f82',900:'#142a66' },
-        accent: '#ffb347'
+  // Brand palette softened (no neon): based on Tailwind blue/indigo mix
+  brand: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' },
+  accent: '#d97706' // muted amber-700 instead of neon orange
       },
       boxShadow: {
         'brand-sm':'0 2px 4px -1px rgba(31,95,255,0.15),0 1px 3px -1px rgba(31,95,255,0.08)',

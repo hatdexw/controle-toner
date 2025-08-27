@@ -30,12 +30,12 @@
         </script>
 </head>
 <body class="min-h-screen flex flex-col pt-24 selection:bg-brand-500/90">
-    <nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-gray-900/80 dark:bg-gray-950/70 border-b border-white/10">
+    <nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-white/70 dark:bg-gray-950/70 border-b border-black/5 dark:border-white/10">
         <div class="app-container h-20 flex items-center justify-between">
             <div class="flex items-center gap-6">
                 <a href="/controle-toner/" class="group inline-flex items-center gap-2">
-                    
-                    <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-300 via-white to-brand-200">Controle de Toners</span>
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-brand-600 text-white font-bold">CT</span>
+                    <span class="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">Controle de Toners</span>
                 </a>
             </div>
             <button id="mobileMenuBtn" class="lg:hidden neutral-btn !px-3 !py-2" aria-label="Abrir menu">
@@ -48,26 +48,28 @@
                 if ($current_uri === '/controle-toner') { $current_uri = '/controle-toner/'; }
                 if ($current_uri !== '/controle-toner/') { $current_uri = rtrim($current_uri, '/'); }
                 $nav_links = [
+                    '/controle-toner/dashboard' => 'Dashboard',
                     '/controle-toner/' => 'Impressoras',
                     '/controle-toner/estoque' => 'Estoque',
                     '/controle-toner/impressoras' => 'Gerenciar',
                     '/controle-toner/historico' => 'Histórico',
                 ];
                 foreach ($nav_links as $url => $text) {
-                    $active = ($current_uri === $url) ? 'nav-link-active' : 'nav-link';
-                    echo '<a href="'.$url.'" class="'.$active.'">'.$text.'</a>';
+                    $isActive = ($current_uri === $url);
+                    $cls = $isActive ? 'px-3 py-2 rounded-full bg-brand-600 text-white text-sm font-medium shadow-brand-sm' : 'px-3 py-2 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800';
+                    echo '<a href="'.$url.'" class="'.$cls.'">'.$text.'</a>';
                 }
                 ?>
-                <button id="themeToggle" class="nav-link !px-3" aria-label="Alternar tema">
+                <button id="themeToggle" class="px-3 py-2 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Alternar tema">
                     <span class="theme-icon-sun block dark:hidden">🌞</span>
                     <span class="theme-icon-moon hidden dark:block">🌙</span>
                 </button>
-                <button id="pwaInstallBtn" class="nav-link !px-3 hidden" aria-label="Instalar Aplicativo">Instalar</button>
+                <button id="pwaInstallBtn" class="px-3 py-2 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hidden" aria-label="Instalar Aplicativo">Instalar</button>
             </div>
         </div>
         <div id="mobilePanel" class="lg:hidden hidden px-4 pb-6 origin-top animate-scale-in">
             <div class="glass-card p-4 flex flex-col gap-2">
-                <?php foreach ($nav_links as $url => $text) { $active = ($current_uri === $url) ? 'nav-link-active' : 'nav-link'; echo '<a href="'.$url.'" class="'.$active.'">'.$text.'</a>'; } ?>
+                <?php foreach ($nav_links as $url => $text) { $isActive = ($current_uri === $url); $cls = $isActive ? 'px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium' : 'px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'; echo '<a href="'.$url.'" class="'.$cls.'">'.$text.'</a>'; } ?>
                 <button id="themeToggleMobile" class="nav-link !justify-start !px-3" aria-label="Alternar tema (mobile)">
                     <span class="theme-icon-sun block dark:hidden">🌞 Tema Claro</span>
                     <span class="theme-icon-moon hidden dark:block">🌙 Tema Escuro</span>
@@ -75,4 +77,4 @@
             </div>
         </div>
     </nav>
-    <main class="flex-grow app-container py-10">
+    <main class="flex-grow app-container py-8">

@@ -14,6 +14,11 @@ body { -ms-overflow-style: none; }
 @layer components {
   .app-container { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
   .glass-card { @apply relative bg-white/80 dark:bg-white/10 backdrop-blur-md rounded-2xl border border-white/40 dark:border-white/15 shadow-glass transition hover:shadow-brand overflow-hidden ring-1 ring-black/5 dark:ring-white/5; }
+  .soft-card { @apply relative rounded-xl border shadow-sm bg-white dark:bg-gray-900 border-gray-200/80 dark:border-gray-800/80; }
+  .soft-card-green { @apply soft-card ring-1 ring-green-500/10; }
+  .soft-card-red { @apply soft-card ring-1 ring-red-500/10; }
+  .soft-card-blue { @apply soft-card ring-1 ring-blue-500/10; }
+  .soft-card-purple { @apply soft-card ring-1 ring-purple-500/10; }
   .glass-card-critical { @apply glass-card before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-red-500 before:content-[''] before:pointer-events-none; }
   .glass-card-warning { @apply glass-card before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-yellow-400 before:content-[''] before:pointer-events-none; }
   .card-header { @apply flex items-start justify-between mb-4; }

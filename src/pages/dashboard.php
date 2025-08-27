@@ -1,88 +1,139 @@
 <?php
 require_once __DIR__.'/../../layout/header.php';
-use App\Services\StatsService; 
-$service = new StatsService($pdo); 
-$stats = $service->summary();
-$lowPrinters = $pdo->query("SELECT codigo, modelo, toner_status FROM impressoras WHERE toner_status IS NOT NULL AND toner_status <= 15 ORDER BY toner_status ASC LIMIT 5")->fetchAll();
-$criticalSup = $pdo->query("SELECT modelo, tipo, quantidade FROM suprimentos WHERE quantidade <= 2 ORDER BY quantidade ASC LIMIT 5")->fetchAll();
-// Aggregated data for charts
-// Toner distribution buckets
-$tonerBuckets = $pdo->query("SELECT 
-  SUM(CASE WHEN toner_status = 0 THEN 1 ELSE 0 END) AS vazio,
-  SUM(CASE WHEN toner_status BETWEEN 1 AND 15 THEN 1 ELSE 0 END) AS baixo,
-  SUM(CASE WHEN toner_status BETWEEN 16 AND 50 THEN 1 ELSE 0 END) AS medio,
-  SUM(CASE WHEN toner_status BETWEEN 51 AND 100 THEN 1 ELSE 0 END) AS alto
-FROM impressoras")->fetch(PDO::FETCH_ASSOC) ?: ['vazio'=>0,'baixo'=>0,'medio'=>0,'alto'=>0];
-
-// Supplies stock by type
-$suprimentosPorTipo = $pdo->query("SELECT tipo, SUM(quantidade) AS total FROM suprimentos GROUP BY tipo ORDER BY tipo")->fetchAll(PDO::FETCH_ASSOC);
-
-// Printer status summary
-$statusSummary = $pdo->query("SELECT 
-  SUM(CASE WHEN toner_status IS NULL THEN 1 ELSE 0 END) AS sem_dado,
-  SUM(CASE WHEN toner_status = 0 THEN 1 ELSE 0 END) AS vazio,
-  SUM(CASE WHEN toner_status BETWEEN 1 AND 15 THEN 1 ELSE 0 END) AS baixo,
-  SUM(CASE WHEN toner_status > 15 THEN 1 ELSE 0 END) AS ok
-FROM impressoras")->fetch(PDO::FETCH_ASSOC);
-
-// Exchanges last 7 days timeline
-$historicoStmt = $pdo->prepare("SELECT DATE(data_troca) d, COUNT(*) c FROM historico_trocas WHERE data_troca >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(data_troca) ORDER BY d ASC");
-$historicoStmt->execute();
-$historicoSeriesRaw = $historicoStmt->fetchAll(PDO::FETCH_KEY_PAIR); // date => count
-$dates = [];$counts=[];for($i=6;$i>=0;$i--){$day=date('Y-m-d',strtotime("-$i day"));$dates[]=$day;$counts[]=(int)($historicoSeriesRaw[$day]??0);} 
+use App\Services\StatsService;
+$service = new StatsService($pdo);
+$selectedPeriod = isset($_GET['period']) ? preg_replace('/[^0-9\-]/','',$_GET['period']) : null;
+$data = $service->dashboardData($selectedPeriod);
+$stats = $data['summary'];
+$tonerBuckets = $data['tonerBuckets'];
+$suprimentosPorTipo = $data['suppliesByType'];
+$statusSummary = $data['status'];
+$dates = array_map(fn($l)=>date('Y-m-d', strtotime(str_replace('/','-',$l))), $data['exchanges']['labels']);
+$counts = $data['exchanges']['values'];
+$lowPrinters = $data['lowPrinters'];
+$criticalSup = $data['criticalSupplies'];
 ?>
-<h1 class="section-title">Dashboard</h1>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Impressoras</p><p class="text-3xl font-bold mt-2"><?= $stats['totalPrinters'] ?></p></div>
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Toner Baixo (≤15%)</p><p class="text-3xl font-bold mt-2 text-yellow-500"><?= $stats['lowToner'] ?></p></div>
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Toner Vazio</p><p class="text-3xl font-bold mt-2 text-red-500"><?= $stats['emptyToner'] ?></p></div>
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Suprimentos</p><p class="text-3xl font-bold mt-2"><?= $stats['totalSupplies'] ?></p></div>
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Suprimentos Críticos (≤2)</p><p class="text-3xl font-bold mt-2 text-orange-500"><?= $stats['lowStockSupplies'] ?></p></div>
-  <div class="glass-card p-6 anim-hover-lift"><p class="text-sm text-gray-500 dark:text-gray-400">Atualização</p><p class="text-lg font-medium mt-2"><?= date('d/m/Y H:i') ?></p></div>
+<div class="flex items-center justify-between mb-4">
+  <div class="flex items-start gap-3">
+    <div class="h-10 w-10 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-500/20 dark:text-brand-200 flex items-center justify-center">📊</div>
+    <div>
+      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-800 dark:text-gray-100">Dashboard</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Visão geral dos toners, suprimentos e últimas trocas.</p>
+    </div>
+  </div>
+  <form method="get" class="flex items-center gap-2">
+    <label class="text-sm text-gray-600 dark:text-gray-300">Período</label>
+    <?php $currentPeriod = isset($_GET['period']) ? preg_replace('/[^0-9\-]/','',$_GET['period']) : date('Y-m'); ?>
+    <input name="period" type="month" value="<?= htmlspecialchars($currentPeriod) ?>" class="form-input !py-2 !px-3 max-w-[180px]" />
+    <button class="primary-btn !py-2 !px-4">Aplicar</button>
+    <button id="dashRefresh" type="button" class="neutral-btn !px-3 !py-2" title="Atualizar agora">Atualizar</button>
+  </form>
 </div>
-<div class="glass-card p-8 anim-hover-lift">
-  <div class="card-header mb-4"><h2 class="card-title">Últimas Trocas</h2></div>
-  <div class="overflow-x-auto">
-    <table class="table-base">
-      <thead class="table-head-row"><tr><th class="table-head-cell">Data</th><th class="table-head-cell">Impressora</th><th class="table-head-cell">Suprimento</th></tr></thead>
-      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-        <?php if(empty($stats['lastExchanges'])): ?>
-          <tr><td colspan="3" class="table-cell text-center text-gray-500">Sem registros ainda.</td></tr>
-        <?php else: foreach($stats['lastExchanges'] as $ex): ?>
-          <tr class="table-row"><td class="table-cell font-medium"><?= date('d/m/Y H:i', strtotime($ex['data_troca'])) ?></td><td class="table-cell"><?= htmlspecialchars($ex['codigo']) ?></td><td class="table-cell"><?= htmlspecialchars($ex['modelo']) ?></td></tr>
-        <?php endforeach; endif; ?>
-      </tbody>
-    </table>
+<?php 
+  $withData = (int)$stats['totalPrinters'] - (int)$statusSummary['sem_dado'];
+  $typesCount = count($suprimentosPorTipo);
+  $exTotal = array_sum($counts);
+?>
+<div class="grid grid-cols-12 gap-4 mb-4">
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-green p-4">
+    <div class="text-xs text-gray-500">Impressoras</div>
+    <div class="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mt-1"><?= $stats['totalPrinters'] ?></div>
+    <div class="text-xs text-gray-500 mt-1">Com dado: <?= $withData ?> • Sem dado: <?= (int)$statusSummary['sem_dado'] ?></div>
+  </div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-red p-4">
+    <div class="text-xs text-gray-500">Toners Baixos</div>
+    <div class="text-2xl font-extrabold text-red-600 dark:text-red-300 mt-1"><?= $stats['lowToner'] ?></div>
+    <div class="text-xs text-gray-500 mt-1">Vazios: <?= (int)$stats['emptyToner'] ?> • ≤15%: <?= (int)$stats['lowToner'] ?></div>
+  </div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-blue p-4">
+    <div class="text-xs text-gray-500">Trocas no Período</div>
+    <div class="text-2xl font-extrabold text-brand-600 mt-1"><?= $exTotal ?></div>
+    <div class="text-xs text-gray-500 mt-1">Período: <?= htmlspecialchars($selectedPeriod ?? 'últimos 14 dias') ?></div>
+  </div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-purple p-4">
+    <div class="text-xs text-gray-500">Suprimentos</div>
+    <div class="text-2xl font-extrabold text-purple-600 dark:text-purple-300 mt-1"><?= $stats['totalSupplies'] ?></div>
+    <div class="text-xs text-gray-500 mt-1">Tipos: <?= $typesCount ?> • Críticos: <?= (int)$stats['lowStockSupplies'] ?></div>
   </div>
 </div>
-<div class="mt-12 grid grid-cols-1 xl:grid-cols-2 gap-10">
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-4"><h3 class="card-title text-lg">Distribuição de Toner</h3><span class="badge">Níveis</span></div>
-    <canvas id="chartTonerDist" height="200" aria-label="Gráfico de distribuição de níveis de toner" role="img"></canvas>
+
+<div class="grid grid-cols-12 gap-4 mb-4">
+  <div class="col-span-12 xl:col-span-3 soft-card p-4">
+    <div class="text-xs text-gray-500">Insights</div>
+    <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 list-disc pl-4 space-y-1">
+      <?php foreach(($data['insights']??[]) as $ins): ?>
+      <li><?= htmlspecialchars($ins) ?></li>
+      <?php endforeach; ?>
+    </ul>
   </div>
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-4"><h3 class="card-title text-lg">Estoque por Tipo</h3><span class="badge">Suprimentos</span></div>
-    <canvas id="chartSupplies" height="200" aria-label="Gráfico de estoque por tipo" role="img"></canvas>
-  </div>
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-4"><h3 class="card-title text-lg">Status das Impressoras</h3><span class="badge">Health</span></div>
-    <canvas id="chartPrinterStatus" height="200" aria-label="Gráfico de status das impressoras" role="img"></canvas>
-  </div>
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-4"><h3 class="card-title text-lg">Trocas (7 dias)</h3><span class="badge">Tendência</span></div>
-    <canvas id="chartExchanges" height="200" aria-label="Gráfico de trocas nos últimos 7 dias" role="img"></canvas>
+  <div class="col-span-12 xl:col-span-9 soft-card p-4">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Gastos por Categoria (Distribuição de Toner)</h3></div>
+    <div class="h-[180px]"><canvas id="chartTonerDist" class="w-full h-full" role="img" aria-label="Distribuição"></canvas></div>
   </div>
 </div>
+
+<div class="grid grid-cols-12 gap-4 items-stretch">
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
+    <div class="card-header mb-1"><h2 class="card-title text-base">Últimas Trocas</h2></div>
+    <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
+      <?php if(empty($stats['lastExchanges'])): ?>
+        <li class="text-gray-500 dark:text-gray-400">Sem registros ainda.</li>
+      <?php else: $i=0; foreach($stats['lastExchanges'] as $ex): if($i++>=5) break; ?>
+        <li class="flex items-center justify-between">
+          <span class="font-medium text-gray-700 dark:text-gray-200 truncate"><?= htmlspecialchars($ex['codigo']) ?></span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 ml-3 shrink-0"><?= date('d/m H:i', strtotime($ex['data_troca'])) ?></span>
+        </li>
+      <?php endforeach; endif; ?>
+    </ul>
+  </div>
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 glass-card p-3">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Mais Críticas</h3><span class="badge">Toner baixo</span></div>
+    <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
+      <?php if(empty($lowPrinters)): ?>
+        <li class="text-gray-500 dark:text-gray-400">Sem impressoras críticas.</li>
+      <?php else: foreach($lowPrinters as $lp): ?>
+        <li class="flex items-center justify-between">
+          <span class="truncate font-medium"><?= htmlspecialchars($lp['codigo']) ?> — <?= htmlspecialchars($lp['modelo']) ?></span>
+          <span class="ml-3 text-xs px-2 py-0.5 rounded-full <?= ((int)$lp['toner_status']<=5?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300') ?>"><?= (int)$lp['toner_status'] ?>%</span>
+        </li>
+      <?php endforeach; endif; ?>
+    </ul>
+  </div>
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Estoque por Tipo</h3><span class="badge">Suprimentos</span></div>
+    <div class="h-[120px]"><canvas id="chartSupplies" class="w-full h-full" aria-label="Gráfico de estoque por tipo" role="img"></canvas></div>
+  </div>
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Status das Impressoras</h3><span class="badge">Health</span></div>
+    <div class="h-[120px]"><canvas id="chartPrinterStatus" class="w-full h-full" aria-label="Gráfico de status das impressoras" role="img"></canvas></div>
+  </div>
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Trocas (7 dias)</h3><span class="badge">Tendência</span></div>
+    <div class="h-[140px]"><canvas id="chartExchanges" class="w-full h-full" aria-label="Gráfico de trocas nos últimos 7 dias" role="img"></canvas></div>
+  </div>
+  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
+    <div class="card-header mb-1"><h3 class="card-title text-base">Suprimentos Críticos</h3><span class="badge">Estoque</span></div>
+    <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
+      <?php if(empty($criticalSup)): ?>
+        <li class="text-gray-500 dark:text-gray-400">Nenhum suprimento crítico.</li>
+      <?php else: foreach($criticalSup as $cs): ?>
+        <li class="flex justify-between"><span class="truncate"><?= htmlspecialchars($cs['modelo']) ?> (<?= htmlspecialchars($cs['tipo']) ?>)</span><span class="text-xs px-2 py-0.5 rounded-full <?= ($cs['quantidade']==0?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-orange-500/20 text-orange-600 dark:text-orange-300') ?>"><?= (int)$cs['quantidade'] ?></span></li>
+      <?php endforeach; endif; ?>
+    </ul>
+  </div>
+</div>
+
 <script>
-// Defer Chart.js loading only on dashboard
 window.addEventListener('DOMContentLoaded',()=>{
   const script=document.createElement('script');
   script.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
   script.onload=()=>initCharts();
   document.head.appendChild(script);
+  // Refresh button (simple full reload; could be improved to partial in future)
+  document.getElementById('dashRefresh')?.addEventListener('click',()=>{ location.reload(); });
 });
 function initCharts(){
-  const tonerData = <?= json_encode(array_values($tonerBuckets), JSON_NUMERIC_CHECK) ?>; // [vazio, baixo, medio, alto]
+  const tonerData = <?= json_encode(array_values($tonerBuckets), JSON_NUMERIC_CHECK) ?>;
   const suppliesData = <?= json_encode(array_map(fn($r)=>(int)$r['total'],$suprimentosPorTipo), JSON_NUMERIC_CHECK) ?>;
   const suppliesLabels = <?= json_encode(array_map(fn($r)=>$r['tipo'],$suprimentosPorTipo)) ?>;
   const statusData = [
@@ -96,39 +147,27 @@ function initCharts(){
   const dark = document.documentElement.classList.contains('dark');
   const baseGrid = dark? 'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
   const textCol = dark? '#e5e7eb':'#374151';
-  const common = {plugins:{legend:{labels:{color:textCol}}},scales:{x:{grid:{color:baseGrid},ticks:{color:textCol}},y:{grid:{color:baseGrid},ticks:{color:textCol}}}};
+  const commonSmall = {
+    plugins:{ legend:{ display:false } },
+    scales:{ x:{ display:false, grid:{ color:baseGrid } }, y:{ display:false, grid:{ color:baseGrid } } },
+    responsive:true,
+    maintainAspectRatio:false
+  };
   new Chart(document.getElementById('chartTonerDist'),{type:'doughnut',data:{
       labels:['Vazio','Baixo (1-15%)','Médio (16-50%)','Alto (51%+)'],
       datasets:[{data:tonerData,backgroundColor:['#ef4444','#f59e0b','#3b82f6','#10b981'],borderWidth:0}]
-    },options:{plugins:{legend:{position:'bottom'}},cutout:'55%'}});
-  new Chart(document.getElementById('chartSupplies'),{type:'bar',data:{labels:suppliesLabels,datasets:[{label:'Quantidade',data:suppliesData,backgroundColor:'#1f5fff'}]},options:common});
+    },options:{plugins:{legend:{display:false}},cutout:'55%',responsive:true,maintainAspectRatio:false}});
+  new Chart(document.getElementById('chartSupplies'),{type:'bar',data:{labels:suppliesLabels,datasets:[{label:'Qtd',data:suppliesData,backgroundColor:'#1f5fff'}]},options:commonSmall});
   new Chart(document.getElementById('chartPrinterStatus'),{type:'bar',data:{
       labels:['Sem Dado','Vazio','Baixo','OK'],
       datasets:[{label:'Impressoras',data:statusData,backgroundColor:['#6b7280','#ef4444','#f59e0b','#10b981']}]
-    },options:common});
-  new Chart(document.getElementById('chartExchanges'),{type:'line',data:{labels:exchangesLabels,datasets:[{label:'Trocas',data:exchangesData,fill:true,borderColor:'#1f5fff',backgroundColor:'rgba(31,95,255,0.15)',tension:.35}]},options:common});
+    },options:commonSmall});
+  const exchangeOpts = {
+    plugins:{ legend:{ display:false } },
+    scales:{ x:{ display:true, ticks:{ color:textCol, maxTicksLimit:10 }, grid:{ color:baseGrid } }, y:{ display:true, ticks:{ color:textCol, precision:0 }, grid:{ color:baseGrid } } },
+    responsive:true, maintainAspectRatio:false
+  };
+  new Chart(document.getElementById('chartExchanges'),{type:'line',data:{labels:exchangesLabels,datasets:[{label:'Trocas',data:exchangesData,fill:true,borderColor:'#1f5fff',backgroundColor:'rgba(31,95,255,0.15)',tension:.35}]},options:exchangeOpts});
 }
 </script>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-2"><h3 class="card-title text-lg">Alertas Toner Baixo</h3><span class="badge">Top 5</span></div>
-    <ul class="space-y-2 text-sm">
-      <?php if(empty($lowPrinters)): ?>
-        <li class="text-gray-500 dark:text-gray-400">Nenhuma impressora em alerta.</li>
-      <?php else: foreach($lowPrinters as $lp): ?>
-        <li class="flex justify-between"><span class="font-medium text-gray-700 dark:text-gray-200"><?= htmlspecialchars($lp['codigo']) ?></span><span class="text-xs px-2 py-0.5 rounded-full <?= ($lp['toner_status']<=5?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300') ?>"><?= (int)$lp['toner_status'] ?>%</span></li>
-      <?php endforeach; endif; ?>
-    </ul>
-  </div>
-  <div class="glass-card p-6 anim-hover-lift">
-    <div class="card-header mb-2"><h3 class="card-title text-lg">Suprimentos Críticos</h3><span class="badge">Estoque</span></div>
-    <ul class="space-y-2 text-sm">
-      <?php if(empty($criticalSup)): ?>
-        <li class="text-gray-500 dark:text-gray-400">Nenhum suprimento crítico.</li>
-      <?php else: foreach($criticalSup as $cs): ?>
-        <li class="flex justify-between"><span><?= htmlspecialchars($cs['modelo']) ?> (<?= htmlspecialchars($cs['tipo']) ?>)</span><span class="text-xs px-2 py-0.5 rounded-full <?= ($cs['quantidade']==0?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-orange-500/20 text-orange-600 dark:text-orange-300') ?>"><?= (int)$cs['quantidade'] ?></span></li>
-      <?php endforeach; endif; ?>
-    </ul>
-  </div>
-</div>
 <?php require_once __DIR__.'/../../layout/footer.php'; ?>

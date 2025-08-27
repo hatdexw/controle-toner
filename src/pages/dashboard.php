@@ -141,34 +141,6 @@ $criticalSup = $data['criticalSupplies'];
       <?php endforeach; endif; ?>
     </ul>
   </div>
-  
-  <!-- Impressoras com Toner Baixo -->
-  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
-    <div class="card-header mb-1"><h3 class="card-title text-base">Impressoras Prioritárias</h3><span class="badge">Toner baixo</span></div>
-    <ul class="space-y-1.5 text-sm max-h-40 overflow-auto pr-1">
-      <?php if(empty($lowPrinters)): ?>
-        <li class="text-gray-500 dark:text-gray-400">Nenhuma impressora com toner baixo.</li>
-      <?php else: foreach($lowPrinters as $lp): ?>
-        <li class="flex items-center justify-between">
-          <a href="/controle-toner/trocar?impressora_id=<?= $lp['id'] ?>" class="text-brand-700 hover:underline dark:text-brand-300 font-medium truncate" title="Registrar troca para <?= htmlspecialchars($lp['codigo']) ?>">
-            <?= htmlspecialchars($lp['codigo']) ?>
-          </a>
-          <span class="text-xs px-2 py-0.5 rounded-full <?= ((int)$lp['toner_status']<=5?'bg-red-500/20 text-red-600 dark:text-red-300':'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300') ?>"><?= (int)$lp['toner_status'] ?>%</span>
-        </li>
-      <?php endforeach; endif; ?>
-    </ul>
-  </div>
-
-  <!-- Ações Rápidas -->
-  <div class="col-span-12 md:col-span-6 xl:col-span-3 soft-card p-3">
-    <div class="card-header mb-1"><h3 class="card-title text-base">Ações Rápidas</h3><span class="badge">Atalhos</span></div>
-    <div class="grid grid-cols-2 gap-2">
-      <a href="/controle-toner/" class="neutral-btn !w-full !justify-center">Impressoras</a>
-      <a href="/controle-toner/impressoras" class="neutral-btn !w-full !justify-center">Gerenciar</a>
-      <a href="/controle-toner/estoque" class="neutral-btn !w-full !justify-center">Estoque</a>
-      <a href="/controle-toner/historico" class="neutral-btn !w-full !justify-center">Histórico</a>
-    </div>
-  </div>
 </div>
 
 <script>

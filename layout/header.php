@@ -54,11 +54,11 @@
                     '/controle-toner/impressoras' => ['Gerenciar','M12 6v12m6-6H6'],
                     '/controle-toner/historico' => ['Histórico','M8 7V3m8 4V3M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z'],
                 ];
-                foreach ($nav_links as $url => $info) {
-                    [$text,$path] = $info; $isActive = ($current_uri === $url);
-                    $cls = $isActive ? 'px-3 py-2 rounded-full bg-brand-600 text-white text-sm font-medium shadow-brand-sm inline-flex items-center gap-2' : 'px-3 py-2 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex items-center gap-2';
-                    $icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="'.$path.'"/></svg>';
-                    echo '<a href="'.$url.'" class="'.$cls.'">'.$icon.'<span>'.$text.'</span></a>';
+                    foreach ($nav_links as $url => $info) {
+                        [$text,$path] = $info; $isActive = ($current_uri === $url);
+                        $cls = $isActive ? 'px-3 py-2 rounded-full bg-brand-600 text-white text-sm font-medium shadow-brand-sm inline-flex items-center gap-2' : 'px-3 py-2 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex items-center gap-2';
+                        $icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path d="'.$path.'"/></svg>';
+                        echo '<a href="'.$url.'" class="'.$cls.'">'.$icon.'<span>'.htmlspecialchars($text).'</span></a>';
                 }
                 ?>
                 <?php $periodBadge = isset($_GET['period']) ? preg_replace('/[^0-9\-]/','',$_GET['period']) : date('Y-m'); ?>
@@ -72,7 +72,7 @@
         </div>
         <div id="mobilePanel" class="lg:hidden hidden px-4 pb-6 origin-top animate-scale-in">
             <div class="glass-card p-4 flex flex-col gap-2">
-                <?php foreach ($nav_links as $url => $text) { $isActive = ($current_uri === $url); $cls = $isActive ? 'px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium' : 'px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'; echo '<a href="'.$url.'" class="'.$cls.'">'.$text.'</a>'; } ?>
+                <?php foreach ($nav_links as $url => $info) { [$text,$path] = $info; $isActive = ($current_uri === $url); $cls = $isActive ? 'px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium' : 'px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'; echo '<a href="'.$url.'" class="'.$cls.'">'.htmlspecialchars($text).'</a>'; } ?>
                 <button id="themeToggleMobile" class="nav-link !justify-start !px-3" aria-label="Alternar tema (mobile)">
                     <span class="theme-icon-sun block dark:hidden">🌞 Tema Claro</span>
                     <span class="theme-icon-moon hidden dark:block">🌙 Tema Escuro</span>

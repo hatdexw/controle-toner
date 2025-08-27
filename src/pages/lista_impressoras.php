@@ -140,14 +140,15 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <h1 class="section-title">Impressoras</h1>
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 fade-in">
-    <div class="flex gap-2 flex-wrap">
+    <div class="flex gap-2 flex-wrap items-center">
         <?php
             $baseQS = function($params) use($sort,$search){
                     $p=['sort'=>$sort]; if($search!=='') $p['q']=$search; $p=array_merge($p,$params); return '?'.http_build_query($p); };
         ?>
-        <a href="<?= $baseQS(['sort'=>'codigo']) ?>" class="neutral-btn !py-2 !px-4 <?= $sort==='codigo'?'ring-2 ring-brand-500':'' ?>" aria-label="Ordenar por código">Ordenar Código</a>
-        <a href="<?= $baseQS(['sort'=>'toner']) ?>" class="neutral-btn !py-2 !px-4 <?= $sort==='toner'?'ring-2 ring-brand-500':'' ?>" aria-label="Ordenar por nível de toner">Ordenar Toner</a>
-        <a href="<?= $baseQS(['sort'=>'troca']) ?>" class="neutral-btn !py-2 !px-4 <?= $sort==='troca'?'ring-2 ring-brand-500':'' ?>" aria-label="Ordenar por última troca">Ordenar Última Troca</a>
+        <span class="text-xs text-gray-500 dark:text-gray-400">Ordenar:</span>
+        <a href="<?= $baseQS(['sort'=>'codigo']) ?>" class="neutral-btn !py-2 !px-3 <?= $sort==='codigo'?'ring-2 ring-brand-600':'' ?>" aria-label="Ordenar por código">Código</a>
+        <a href="<?= $baseQS(['sort'=>'toner']) ?>" class="neutral-btn !py-2 !px-3 <?= $sort==='toner'?'ring-2 ring-brand-600':'' ?>" aria-label="Ordenar por nível de toner">Toner</a>
+        <a href="<?= $baseQS(['sort'=>'troca']) ?>" class="neutral-btn !py-2 !px-3 <?= $sort==='troca'?'ring-2 ring-brand-600':'' ?>" aria-label="Ordenar por última troca">Última Troca</a>
     </div>
     <form method="GET" class="flex gap-3 items-center">
             <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>" />
@@ -172,10 +173,10 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     else { $card_class_root = 'glass-card'; $icon_classes = 'text-brand-500'; }
     $toner_bar_class = $is_empty ? 'toner-empty' : '';
     // Cor dinâmica da barra (verde>amarelo>laranja>vermelho)
-    $bar_color = 'from-green-500 to-green-400';
+    $bar_color = 'from-emerald-500 to-emerald-400';
     if ($toner_status !== null) {
         if ($toner_status <= 15) $bar_color = 'from-red-600 to-red-500';
-        elseif ($toner_status <= 30) $bar_color = 'from-orange-500 to-orange-400';
+        elseif ($toner_status <= 30) $bar_color = 'from-amber-500 to-amber-400';
         elseif ($toner_status <= 50) $bar_color = 'from-yellow-400 to-yellow-300';
     }
 ?>

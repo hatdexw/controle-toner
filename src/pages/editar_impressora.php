@@ -36,20 +36,21 @@ if (isset($_SESSION['message'])) {
     <div class="card-header mb-6">
         <h2 class="card-title">Detalhes da Impressora</h2>
     </div>
-    <form method="POST" action="/controle-toner/editar_impressora?id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+    <form method="POST" action="/controle-toner/editar_impressora?id=<?= $impressora['id'] ?>" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end" aria-describedby="formHint">
         <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
         <div>
-            <label for="codigo" class="field-label">Codigo</label>
-            <input type="text" name="codigo" id="codigo" value="<?= htmlspecialchars($impressora['codigo']) ?>" class="form-input" required>
+            <label for="codigo" class="field-label">Código</label>
+            <input type="text" name="codigo" id="codigo" value="<?= htmlspecialchars($impressora['codigo']) ?>" class="form-input" required placeholder="Ex: COM-00000.000">
         </div>
         <div>
             <label for="modelo" class="field-label">Modelo</label>
-            <input type="text" name="modelo" id="modelo" value="<?= htmlspecialchars($impressora['modelo']) ?>" class="form-input" required>
+            <input type="text" name="modelo" id="modelo" value="<?= htmlspecialchars($impressora['modelo']) ?>" class="form-input" required placeholder="Ex: HP LaserJet M132fw">
         </div>
         <div>
-            <label for="localizacao" class="field-label">Localizacao</label>
-            <input type="text" name="localizacao" id="localizacao" value="<?= htmlspecialchars($impressora['localizacao']) ?>" class="form-input" required>
+            <label for="localizacao" class="field-label">Localização</label>
+            <input type="text" name="localizacao" id="localizacao" value="<?= htmlspecialchars($impressora['localizacao']) ?>" class="form-input" required placeholder="Ex: Compras">
         </div>
+        <p id="formHint" class="md:col-span-3 text-xs text-gray-500 dark:text-gray-400">Preencha todos os campos antes de salvar.</p>
         <div class="md:col-span-3 flex justify-end gap-4 mt-4">
             <button type="submit" class="primary-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>

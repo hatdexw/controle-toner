@@ -33,10 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-impressora').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            const impressoraId = this.dataset.id;
+            const form = this.closest('form');
+            if(!form) return;
             Swal.fire({
-                title: 'Tem certeza?',
-                text: "Voce nao podera reverter isso!",
+                title: 'Excluir impressora?',
+                text: 'Essa ação não pode ser desfeita.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'impressoras?delete=' + impressoraId;
+                    form.submit();
                 }
             });
         });
@@ -55,10 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-suprimento').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            const suprimentoId = this.dataset.id;
+            const form = this.closest('form');
+            if(!form) return;
             Swal.fire({
-                title: 'Tem certeza?',
-                text: "Voce nao podera reverter isso! Isso pode afetar o historico de trocas.",
+                title: 'Excluir suprimento?',
+                text: 'Essa ação não pode ser desfeita e pode afetar o histórico.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -67,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'estoque?delete=' + suprimentoId;
+                    form.submit();
                 }
             });
         });

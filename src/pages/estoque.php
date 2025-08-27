@@ -30,10 +30,8 @@ if (isset($_SESSION['message'])) { $message_type = $_SESSION['message']['type'];
             <input type="hidden" name="csrf_token" value="<?= generate_csrf_token(); ?>">
             <input type="hidden" name="id" value="<?= $suprimento['id'] ?>">
             <div class="flex-grow flex items-center gap-2">
-              <button type="button" class="neutral-btn !px-3 !py-2" onclick="const i=document.getElementById('quantidade-<?= $suprimento['id'] ?>'); i.value=Math.max(0,parseInt(i.value||0)-1)">-</button>
               <label for="quantidade-<?= $suprimento['id'] ?>" class="sr-only">Quantidade</label>
               <input type="number" name="quantidade" id="quantidade-<?= $suprimento['id'] ?>" value="<?= $suprimento['quantidade'] ?>" class="form-input !py-1 !px-2 text-center w-24">
-              <button type="button" class="neutral-btn !px-3 !py-2" onclick="const i=document.getElementById('quantidade-<?= $suprimento['id'] ?>'); i.value=parseInt(i.value||0)+1">+</button>
             </div>
             <div class="flex space-x-2">
               <button type="submit" name="update_suprimento" class="primary-btn !px-3 !py-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg></button>

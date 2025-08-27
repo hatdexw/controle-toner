@@ -36,6 +36,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+    // Delete via POST (secure)
+    elseif (isset($_POST['delete_impressora']) && isset($_POST['id'])) {
+        $id = (int)$_POST['id'];
+        try {
+            $stmt = $pdo->prepare('DELETE FROM impressoras WHERE id = ?');
+            $stmt->execute([$id]);
+            $_SESSION['message'] = ['type' => 'success', 'text' => "Impressora excluida com sucesso!"];
+        } catch (PDOException $e) {
+            $_SESSION['message'] = ['type' => 'error', 'text' => "Erro ao excluir impressora."];
+        }
+    }
     header('Location: /controle-toner/impressoras');
     exit;
 } elseif (isset($_GET['delete'])) {

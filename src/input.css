@@ -29,6 +29,13 @@ body { -ms-overflow-style: none; }
   .neutral-btn { @apply inline-flex items-center gap-2 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200 font-medium px-4 py-2 shadow-sm transition; }
   .badge { @apply inline-flex items-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300 px-3 py-1 text-xs font-medium; }
   .section-title { @apply text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-400 dark:from-brand-400 dark:to-brand-200 text-center mb-10; }
+  /* KPI small card used in dashboard */
+  .kpi-card { @apply flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm; }
+  .kpi-icon { @apply inline-flex items-center justify-center h-10 w-10 rounded-md text-white; }
+  .kpi-value { @apply text-2xl font-extrabold text-gray-800 dark:text-gray-100; }
+  .kpi-label { @apply text-xs text-gray-500 dark:text-gray-400; }
+  .kpi-trend { @apply text-sm font-medium; }
+  .kpi-sparkline { width:64px; height:28px; }
   .field-label { @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 tracking-wide; }
   .form-input, .form-select, .form-textarea { @apply w-full rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/60 shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500; }
   .toner-bar-wrapper { @apply relative w-full h-4 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden shadow-inner; }

@@ -35,25 +35,57 @@ $criticalSup = $data['criticalSupplies'];
   $exTotal = array_sum($counts);
 ?>
 <div class="grid grid-cols-12 gap-4 mb-4">
-  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-green p-4">
-    <div class="text-xs text-gray-500">Impressoras</div>
-    <div class="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mt-1"><?= $stats['totalPrinters'] ?></div>
-    <div class="text-xs text-gray-500 mt-1">Com dado: <?= $withData ?> • Sem dado: <?= (int)$statusSummary['sem_dado'] ?></div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3">
+    <div class="kpi-card">
+        <div class="kpi-icon bg-brand-600">P</div>
+        <div class="flex-1">
+          <div class="kpi-label">Impressoras</div>
+          <div class="flex items-center justify-between">
+            <div class="kpi-value"><?= $stats['totalPrinters'] ?></div>
+            <canvas id="spark-printers" class="kpi-sparkline"></canvas>
+          </div>
+          <div class="text-xs text-gray-500">Com dado: <?= $withData ?> • Sem dado: <?= (int)$statusSummary['sem_dado'] ?></div>
+        </div>
+    </div>
   </div>
-  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-red p-4">
-    <div class="text-xs text-gray-500">Toners Baixos</div>
-    <div class="text-2xl font-extrabold text-red-600 dark:text-red-300 mt-1"><?= $stats['lowToner'] ?></div>
-    <div class="text-xs text-gray-500 mt-1">Vazios: <?= (int)$stats['emptyToner'] ?> • ≤15%: <?= (int)$stats['lowToner'] ?></div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3">
+    <div class="kpi-card">
+      <div class="kpi-icon bg-red-600">T</div>
+      <div class="flex-1">
+        <div class="kpi-label">Toners Baixos</div>
+        <div class="flex items-center justify-between">
+          <div class="kpi-value text-red-600"><?= $stats['lowToner'] ?></div>
+          <canvas id="spark-toner" class="kpi-sparkline"></canvas>
+        </div>
+        <div class="text-xs text-gray-500">Vazios: <?= (int)$stats['emptyToner'] ?> • ≤15%: <?= (int)$stats['lowToner'] ?></div>
+      </div>
+    </div>
   </div>
-  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-blue p-4">
-    <div class="text-xs text-gray-500">Trocas no Período</div>
-    <div class="text-2xl font-extrabold text-brand-600 mt-1"><?= $exTotal ?></div>
-    <div class="text-xs text-gray-500 mt-1">Período: <?= htmlspecialchars($selectedPeriod ?? 'últimos 14 dias') ?></div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3">
+    <div class="kpi-card">
+      <div class="kpi-icon bg-brand-500">R</div>
+      <div class="flex-1">
+        <div class="kpi-label">Trocas no Período</div>
+        <div class="flex items-center justify-between">
+          <div class="kpi-value"><?= $exTotal ?></div>
+          <canvas id="spark-exchanges" class="kpi-sparkline"></canvas>
+        </div>
+        <div class="text-xs text-gray-500">Período: <?= htmlspecialchars($selectedPeriod ?? 'últimos 14 dias') ?></div>
+      </div>
+    </div>
   </div>
-  <div class="col-span-12 sm:col-span-6 xl:col-span-3 soft-card-purple p-4">
-    <div class="text-xs text-gray-500">Suprimentos</div>
-    <div class="text-2xl font-extrabold text-purple-600 dark:text-purple-300 mt-1"><?= $stats['totalSupplies'] ?></div>
-    <div class="text-xs text-gray-500 mt-1">Tipos: <?= $typesCount ?> • Críticos: <?= (int)$stats['lowStockSupplies'] ?></div>
+  <div class="col-span-12 sm:col-span-6 xl:col-span-3">
+    <div class="kpi-card">
+      <div class="kpi-icon bg-purple-600">S</div>
+      <div class="flex-1">
+        <div class="kpi-label">Suprimentos</div>
+        <div class="flex items-center justify-between">
+          <div class="kpi-value"><?= $stats['totalSupplies'] ?></div>
+          <canvas id="spark-supplies" class="kpi-sparkline"></canvas>
+        </div>
+        <div class="text-xs text-gray-500">Tipos: <?= $typesCount ?> • Críticos: <?= (int)$stats['lowStockSupplies'] ?></div>
+      </div>
+    </div>
   </div>
 </div>
 

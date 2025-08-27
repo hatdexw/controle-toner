@@ -14,4 +14,4 @@ db.php
 database.sql
 
 #arquivos de log
-access.log
+logs/access.log
